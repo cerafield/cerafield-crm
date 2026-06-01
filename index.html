@@ -1083,8 +1083,12 @@ const SEED_DATA = {"projects":[{"id":"mpowasqrkumlo8jg","cre":"2026-05-28T02:50:
 const KEY = 'cera_crm_v2';
 function db(){
   let r=localStorage.getItem(KEY);
-  if(!r){localStorage.setItem(KEY,JSON.stringify(SEED_DATA));return JSON.parse(JSON.stringify(SEED_DATA))}
-  return JSON.parse(r)
+  let d=r?JSON.parse(r):null;
+  if(!d||!d.projects||d.projects.length===0){
+    d=JSON.parse(JSON.stringify(SEED_DATA));
+    localStorage.setItem(KEY,JSON.stringify(d));
+  }
+  return d;
 }
 function save(d){localStorage.setItem(KEY,JSON.stringify(d))}
 function uid(){return Date.now().toString(36)+Math.random().toString(36).substr(2,8)}
