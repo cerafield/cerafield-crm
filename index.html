@@ -250,6 +250,7 @@ textarea{resize:vertical;min-height:75px}
   <div class="hdr-right">
     <span id="syncDot" style="font-size:11px;color:rgba(255,255,255,.35);margin-right:4px">⏳</span>
     <span class="hdr-date" id="hdrDate"></span>
+    <button class="btn btn-ghost btn-sm" id="langBtn" onclick="toggleLang()" style="color:rgba(255,255,255,.7);border-color:rgba(255,255,255,.2);letter-spacing:.5px">🇬🇧 EN</button>
     <button class="btn btn-ghost btn-sm" style="color:rgba(255,255,255,.7);border-color:rgba(255,255,255,.2)" onclick="exportData()">💾 Export</button>
     <button class="btn btn-ghost btn-sm" style="color:rgba(255,255,255,.7);border-color:rgba(255,255,255,.2)" onclick="document.getElementById('impFile').click()">📂 Import</button>
     <input type="file" id="impFile" accept=".json" style="display:none" onchange="importData(event)">
@@ -1208,25 +1209,72 @@ function setupFirebase(){
 }
 function uid(){return Date.now().toString(36)+Math.random().toString(36).substr(2,8)}
 
-// ── LOOKUP MAPS ───────────────────────────────────────────────
-const TYPE_LBL={hotel:'โรงแรม',condo:'คอนโด',hospital:'โรงพยาบาล',office:'สำนักงาน',retail:'ศูนย์การค้า',residential:'บ้าน',government:'ราชการ',other:'อื่นๆ'};
-const STAGE_LBL={design:'🎨 ออกแบบ',construction:'🏗️ ก่อสร้าง',procurement:'🛒 จัดซื้อ',completed:'✅ เสร็จแล้ว'};
+// ── LANGUAGE ──────────────────────────────────────────────────
+let LANG=localStorage.getItem('cera_lang')||'th';
+const _TH={
+  nav:['🏠 ภาพรวม','🏗️ โครงการ','👥 ผู้ติดต่อ','📋 กิจกรรม','📊 รายงาน','📦 โลจิสติกส์'],
+  type:{hotel:'โรงแรม',condo:'คอนโด',hospital:'โรงพยาบาล',office:'สำนักงาน',retail:'ศูนย์การค้า',residential:'บ้าน',government:'ราชการ',other:'อื่นๆ'},
+  stage:{design:'🎨 ออกแบบ',construction:'🏗️ ก่อสร้าง',procurement:'🛒 จัดซื้อ',completed:'✅ เสร็จแล้ว'},
+  role:{owner:'เจ้าของโครงการ',architect:'สถาปนิก',interior:'ออกแบบภายใน',contractor:'ผู้รับเหมา (GC)',mep:'MEP',qs:'QS',pm:'PM',proc:'จัดซื้อ',other:'อื่นๆ'},
+  act:{call:'📞 โทร',email:'📧 อีเมล',line:'💬 LINE',meeting:'🤝 พบ',other:'•'},
+  status:{new:'🆕 ใหม่',contacted:'📞 ติดต่อแล้ว',catalog_sent:'📄 ส่ง Catalog',email_sent:'📧 ส่งอีเมล',line_sent:'💬 ส่ง LINE',followup:'🔔 รอตาม',interested:'✅ สนใจ',not_interested:'❌ ไม่สนใจ'},
+  stat:['โครงการ','ผู้ติดต่อ','เลย Follow up','ต้องตามวันนี้'],
+  done:'ตามแล้ว ✓',allGood:'ไม่มีรายการค้างครับ 🎉',noAct:'ยังไม่มีกิจกรรม'
+};
+const _EN={
+  nav:['🏠 Overview','🏗️ Projects','👥 Contacts','📋 Activities','📊 Report','📦 Logistics'],
+  type:{hotel:'Hotel',condo:'Condo',hospital:'Hospital',office:'Office',retail:'Retail/Mall',residential:'Housing',government:'Government',other:'Other'},
+  stage:{design:'🎨 Design',construction:'🏗️ Construction',procurement:'🛒 Procurement',completed:'✅ Completed'},
+  role:{owner:'Owner',architect:'Architect',interior:'Interior Design',contractor:'Contractor (GC)',mep:'MEP',qs:'QS',pm:'PM',proc:'Procurement',other:'Other'},
+  act:{call:'📞 Call',email:'📧 Email',line:'💬 LINE',meeting:'🤝 Meeting',other:'•'},
+  status:{new:'🆕 New',contacted:'📞 Contacted',catalog_sent:'📄 Catalog Sent',email_sent:'📧 Email Sent',line_sent:'💬 LINE Sent',followup:'🔔 Follow up',interested:'✅ Interested',not_interested:'❌ Not Interested'},
+  stat:['Projects','Contacts','Overdue','Due Today'],
+  done:'Done ✓',allGood:'All caught up! 🎉',noAct:'No activities yet'
+};
+
+// ── LOOKUP MAPS (mutable — updated by applyLang) ──────────────
+const TYPE_LBL={..._TH.type};
+const STAGE_LBL={..._TH.stage};
 const STAGE_CLS={design:'s-design',construction:'s-construction',procurement:'s-procurement',completed:'s-completed'};
-const ROLE_LBL={owner:'เจ้าของโครงการ',architect:'สถาปนิก',interior:'ออกแบบภายใน',contractor:'ผู้รับเหมา (GC)',mep:'MEP',qs:'QS',pm:'PM',proc:'จัดซื้อ',other:'อื่นๆ'};
+const ROLE_LBL={..._TH.role};
 const ROLE_CLS={owner:'r-owner',architect:'r-architect',interior:'r-interior',contractor:'r-contractor',mep:'r-mep',qs:'r-qs',pm:'r-pm',proc:'r-proc',other:'r-other'};
-const ACT_LBL={call:'📞 โทร',email:'📧 อีเมล',line:'💬 LINE',meeting:'🤝 พบ',other:'•'};
+const ACT_LBL={..._TH.act};
 const ACT_CLS={call:'a-call',email:'a-email',line:'a-line',meeting:'a-meeting',other:'b-new'};
 
 const STATUS={
-  new:{lbl:'🆕 ใหม่',cls:'b-new',col:'#6366f1'},
-  contacted:{lbl:'📞 ติดต่อแล้ว',cls:'b-contacted',col:'#3b82f6'},
-  catalog_sent:{lbl:'📄 ส่ง Catalog',cls:'b-catalog',col:'#f59e0b'},
-  email_sent:{lbl:'📧 ส่งอีเมล',cls:'b-email',col:'#8b5cf6'},
-  line_sent:{lbl:'💬 ส่ง LINE',cls:'b-line',col:'#10b981'},
-  followup:{lbl:'🔔 รอตาม',cls:'b-followup',col:'#ef4444'},
-  interested:{lbl:'✅ สนใจ',cls:'b-interested',col:'#10b981'},
-  not_interested:{lbl:'❌ ไม่สนใจ',cls:'b-lost',col:'#9ca3af'}
+  new:{lbl:_TH.status.new,cls:'b-new',col:'#6366f1'},
+  contacted:{lbl:_TH.status.contacted,cls:'b-contacted',col:'#3b82f6'},
+  catalog_sent:{lbl:_TH.status.catalog_sent,cls:'b-catalog',col:'#f59e0b'},
+  email_sent:{lbl:_TH.status.email_sent,cls:'b-email',col:'#8b5cf6'},
+  line_sent:{lbl:_TH.status.line_sent,cls:'b-line',col:'#10b981'},
+  followup:{lbl:_TH.status.followup,cls:'b-followup',col:'#ef4444'},
+  interested:{lbl:_TH.status.interested,cls:'b-interested',col:'#10b981'},
+  not_interested:{lbl:_TH.status.not_interested,cls:'b-lost',col:'#9ca3af'}
 };
+
+function applyLang(lang){
+  LANG=lang;
+  localStorage.setItem('cera_lang',lang);
+  const L=lang==='en'?_EN:_TH;
+  Object.assign(TYPE_LBL,L.type);
+  Object.assign(STAGE_LBL,L.stage);
+  Object.assign(ROLE_LBL,L.role);
+  Object.assign(ACT_LBL,L.act);
+  Object.keys(STATUS).forEach(k=>{if(L.status[k])STATUS[k].lbl=L.status[k]});
+  document.querySelectorAll('.nav-tab').forEach((t,i)=>{if(L.nav[i])t.textContent=L.nav[i]});
+  const btn=document.getElementById('langBtn');
+  if(btn)btn.innerHTML=lang==='en'?'🇹🇭 TH':'🇬🇧 EN';
+  if(!fbReady)return;
+  const panel=document.querySelector('.panel.active');
+  if(!panel)return;
+  const tid=panel.id.replace('panel-','');
+  if(tid==='dash')renderDash();
+  else if(tid==='proj')renderProjs();
+  else if(tid==='cont')renderConts();
+  else if(tid==='act')renderActs();
+  else if(tid==='rpt')renderRpt();
+}
+function toggleLang(){applyLang(LANG==='th'?'en':'th')}
 
 // ── NAVIGATION ────────────────────────────────────────────────
 function showTab(name){
@@ -1262,15 +1310,16 @@ function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t
 // ── HELPERS ───────────────────────────────────────────────────
 function fmtDate(s){
   if(!s)return'';
-  try{const d=new Date(s+'T00:00:00');return d.toLocaleDateString('th-TH',{day:'numeric',month:'short',year:'2-digit'})}
+  try{const d=new Date(s+'T00:00:00');return d.toLocaleDateString(LANG==='en'?'en-GB':'th-TH',{day:'numeric',month:'short',year:'2-digit'})}
   catch{return s}
 }
 function today(){return new Date().toISOString().split('T')[0]}
 function isOver(s){return s&&s<today()}
 function daysText(s){
   const t=today();
-  if(s===t)return'วันนี้!';
+  if(s===t)return LANG==='en'?'Today!':'วันนี้!';
   const diff=Math.round((new Date(s)-new Date(t))/(864e5));
+  if(LANG==='en')return diff<0?`${Math.abs(diff)}d overdue`:`${diff}d left`;
   return diff<0?`เลย ${Math.abs(diff)} วันแล้ว`:`อีก ${diff} วัน`;
 }
 function avatar(name,col){return`<div class="c-avatar" style="background:${col||'var(--navy)'}">${(name||'?')[0].toUpperCase()}</div>`}
@@ -1684,15 +1733,17 @@ function renderDash(){
   const over=pend.filter(a=>a.fuDate<t);
   const tod=pend.filter(a=>a.fuDate===t);
   const up=pend.filter(a=>a.fuDate>t);
+  const _sl=(LANG==='en'?_EN:_TH).stat;
   document.getElementById('statsGrid').innerHTML=`
-    <div class="stat-card"><div class="stat-num">${x.projects.length}</div><div class="stat-lbl">โครงการ</div></div>
-    <div class="stat-card"><div class="stat-num">${x.contacts.length}</div><div class="stat-lbl">ผู้ติดต่อ</div></div>
-    <div class="stat-card ${over.length?'red':''}"><div class="stat-num">${over.length}</div><div class="stat-lbl">เลย Follow up</div></div>
-    <div class="stat-card ${tod.length?'yellow':''}"><div class="stat-num">${tod.length}</div><div class="stat-lbl">ต้องตามวันนี้</div></div>`;
+    <div class="stat-card"><div class="stat-num">${x.projects.length}</div><div class="stat-lbl">${_sl[0]}</div></div>
+    <div class="stat-card"><div class="stat-num">${x.contacts.length}</div><div class="stat-lbl">${_sl[1]}</div></div>
+    <div class="stat-card ${over.length?'red':''}"><div class="stat-num">${over.length}</div><div class="stat-lbl">${_sl[2]}</div></div>
+    <div class="stat-card ${tod.length?'yellow':''}"><div class="stat-num">${tod.length}</div><div class="stat-lbl">${_sl[3]}</div></div>`;
 
   const allfu=[...over.map(a=>({...a,urg:'overdue'})),...tod.map(a=>({...a,urg:'today'})),...up.slice(0,6).map(a=>({...a,urg:'upcoming'}))];
   const fu=document.getElementById('fuList');
-  if(!allfu.length){fu.innerHTML=`<div class="empty"><div class="empty-ico">🎉</div><div>ไม่มีรายการค้างครับ<br>เยี่ยมมาก!</div></div>`}
+  const _L=LANG==='en'?_EN:_TH;
+  if(!allfu.length){fu.innerHTML=`<div class="empty"><div class="empty-ico">🎉</div><div>${_L.allGood}</div></div>`}
   else{fu.innerHTML=allfu.map(a=>{
     const c=x.contacts.find(q=>q.id===a.cid);
     const p=c?x.projects.find(q=>q.id===c.projId):null;
@@ -1707,7 +1758,7 @@ function renderDash(){
       </div>
       <div style="text-align:right;flex-shrink:0">
         <div class="${dcls}">${daysText(a.fuDate)}</div>
-        <button class="btn btn-sm" style="margin-top:5px;background:${bcol}" onclick="event.stopPropagation();toggleFU('${a.id}',null)">ตามแล้ว ✓</button>
+        <button class="btn btn-sm" style="margin-top:5px;background:${bcol}" onclick="event.stopPropagation();toggleFU('${a.id}',null)">${_L.done}</button>
       </div>
     </div>`}).join('')}
 
@@ -1814,7 +1865,8 @@ function importData(e){
 }
 
 // ── INIT ───────────────────────────────────────────────────────
-document.getElementById('hdrDate').textContent=new Date().toLocaleDateString('th-TH',{weekday:'short',day:'numeric',month:'long',year:'numeric'});
+document.getElementById('hdrDate').textContent=new Date().toLocaleDateString(LANG==='en'?'en-GB':'th-TH',{weekday:'short',day:'numeric',month:'long',year:'numeric'});
+applyLang(LANG); // restore saved language preference (updates nav + button before Firebase loads)
 setupFirebase();
 </script>
 </body>
