@@ -1,0 +1,1646 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CERAFIELD | CRM</title>
+<style>
+:root {
+  --navy: #1a2b5e;
+  --navy2: #243570;
+  --gold: #c9a84c;
+  --cream: #f7f6f2;
+  --white: #ffffff;
+  --gl: #f0eff0;
+  --gray: #9ca3af;
+  --gd: #4b5563;
+  --text: #1f2937;
+  --red: #ef4444;
+  --green: #10b981;
+  --yellow: #f59e0b;
+  --border: #e5e7eb;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,'Helvetica Neue',sans-serif;background:var(--cream);color:var(--text);min-height:100vh}
+
+/* HEADER */
+.hdr{background:var(--navy);height:58px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.25)}
+.hdr-logo{display:flex;flex-direction:column}
+.hdr-logo .l1{font-size:17px;font-weight:800;letter-spacing:3px;color:#fff}
+.hdr-logo .l2{font-size:10px;color:var(--gold);letter-spacing:1.5px;text-transform:uppercase}
+.hdr-search input{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;padding:7px 14px;border-radius:20px;width:240px;font-size:13px;outline:none}
+.hdr-search input::placeholder{color:rgba(255,255,255,.4)}
+.hdr-search input:focus{background:rgba(255,255,255,.15);border-color:var(--gold)}
+.hdr-right{display:flex;gap:6px;align-items:center}
+.hdr-date{font-size:11px;color:rgba(255,255,255,.4);margin-right:4px}
+
+/* NAV */
+.nav{background:var(--navy2);display:flex;padding:0 20px;gap:2px;overflow-x:auto}
+.nav-tab{padding:11px 18px;color:rgba(255,255,255,.55);cursor:pointer;font-size:13px;font-weight:500;border-bottom:3px solid transparent;white-space:nowrap;transition:.15s}
+.nav-tab:hover{color:#fff}
+.nav-tab.active{color:var(--gold);border-bottom-color:var(--gold)}
+
+/* MAIN */
+.main{max-width:1180px;margin:0 auto;padding:20px}
+.panel{display:none}.panel.active{display:block}
+
+/* CARDS */
+.card{background:#fff;border-radius:12px;padding:20px;box-shadow:0 1px 3px rgba(0,0,0,.07);border:1px solid var(--border)}
+
+/* STATS */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
+.stat-card{background:#fff;border-radius:12px;padding:18px;border:1px solid var(--border);text-align:center}
+.stat-num{font-size:30px;font-weight:800;color:var(--navy)}
+.stat-lbl{font-size:11px;color:var(--gray);margin-top:3px;text-transform:uppercase;letter-spacing:.4px}
+.stat-card.red .stat-num{color:var(--red)}
+.stat-card.yellow .stat-num{color:var(--yellow)}
+.stat-card.green .stat-num{color:var(--green)}
+
+/* SECTION */
+.sec-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.sec-title{font-size:15px;font-weight:700;color:var(--navy)}
+
+/* BUTTONS */
+.btn{padding:8px 14px;border-radius:8px;border:none;cursor:pointer;font-size:13px;font-weight:500;transition:.15s;display:inline-flex;align-items:center;gap:5px}
+.btn-primary{background:var(--navy);color:#fff}.btn-primary:hover{background:var(--navy2)}
+.btn-gold{background:var(--gold);color:#fff}.btn-gold:hover{background:#b8932f}
+.btn-ghost{background:transparent;color:var(--gd);border:1px solid var(--border)}.btn-ghost:hover{background:var(--gl)}
+.btn-danger{background:#fee2e2;color:#991b1b}.btn-danger:hover{background:#fecaca}
+.btn-sm{padding:5px 10px;font-size:12px}
+
+/* TABLES */
+.tbl-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;padding:9px 12px;background:var(--cream);color:var(--gd);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.4px;border-bottom:1px solid var(--border)}
+td{padding:11px 12px;border-bottom:1px solid var(--border);vertical-align:top}
+tr:hover td{background:#fafafa}
+tr:last-child td{border-bottom:none}
+
+/* BADGES */
+.badge{display:inline-flex;align-items:center;padding:2px 9px;border-radius:20px;font-size:11px;font-weight:600;white-space:nowrap}
+.b-new{background:#e0e7ff;color:#3730a3}
+.b-contacted{background:#dbeafe;color:#1d4ed8}
+.b-catalog{background:#fef3c7;color:#92400e}
+.b-email{background:#ede9fe;color:#5b21b6}
+.b-line{background:#d1fae5;color:#065f46}
+.b-followup{background:#fee2e2;color:#991b1b}
+.b-interested{background:#d1fae5;color:#065f46}
+.b-lost{background:#f3f4f6;color:#6b7280}
+.r-owner{background:#fdf2f8;color:#86198f}
+.r-architect{background:#eff6ff;color:#1d4ed8}
+.r-contractor{background:#fef9c3;color:#854d0e}
+.r-interior{background:#fdf4ff;color:#7e22ce}
+.r-qs{background:#ecfdf5;color:#065f46}
+.r-pm{background:#ecfdf5;color:#065f46}
+.r-proc{background:#fff7ed;color:#9a3412}
+.r-mep{background:#f0f9ff;color:#0369a1}
+.r-other{background:#f3f4f6;color:#374151}
+.s-design{background:#eff6ff;color:#1d4ed8}
+.s-construction{background:#fef3c7;color:#92400e}
+.s-procurement{background:#d1fae5;color:#065f46}
+.s-completed{background:#f3f4f6;color:#374151}
+.a-call{background:#dbeafe;color:#1e40af}
+.a-email{background:#ede9fe;color:#5b21b6}
+.a-line{background:#d1fae5;color:#065f46}
+.a-meeting{background:#fef3c7;color:#92400e}
+
+/* FOLLOW-UP ITEMS */
+.fu-item{display:flex;align-items:flex-start;gap:12px;padding:13px;border:1px solid var(--border);border-radius:10px;margin-bottom:9px;background:#fff;cursor:pointer;transition:.2s}
+.fu-item:hover{border-color:var(--navy);box-shadow:0 2px 8px rgba(0,0,0,.08)}
+.fu-item.overdue{border-left:4px solid var(--red)}
+.fu-item.today{border-left:4px solid var(--yellow)}
+.fu-item.upcoming{border-left:4px solid var(--green)}
+.fu-avatar{width:38px;height:38px;border-radius:50%;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;flex-shrink:0}
+.fu-name{font-weight:600;font-size:13px}
+.fu-proj{font-size:11px;color:var(--gray);margin-top:2px}
+.fu-action{font-size:12px;color:var(--gd);margin-top:3px}
+.fu-date-red{font-size:11px;font-weight:700;color:var(--red)}
+.fu-date-yellow{font-size:11px;font-weight:700;color:var(--yellow)}
+.fu-date-green{font-size:11px;font-weight:700;color:var(--green)}
+
+/* MODAL */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;align-items:center;justify-content:center}
+.overlay.open{display:flex}
+.modal{background:#fff;border-radius:16px;width:560px;max-width:calc(100vw - 24px);max-height:calc(100vh - 48px);overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.modal-wide{width:720px}
+.modal-hdr{padding:18px 22px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:#fff;z-index:1}
+.modal-title{font-size:15px;font-weight:700;color:var(--navy)}
+.modal-close{width:30px;height:30px;border:none;background:var(--gl);border-radius:50%;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;color:var(--gd)}
+.modal-body{padding:18px 22px}
+.modal-footer{padding:14px 22px 18px;display:flex;gap:8px;justify-content:flex-end;border-top:1px solid var(--border)}
+
+/* FORMS */
+.fg{margin-bottom:14px}
+.fr{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+label{display:block;font-size:11px;font-weight:700;color:var(--gd);margin-bottom:5px;text-transform:uppercase;letter-spacing:.3px}
+input,select,textarea{width:100%;padding:9px 11px;border:1px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit;color:var(--text);outline:none;transition:.2s;background:#fff}
+input:focus,select:focus,textarea:focus{border-color:var(--navy);box-shadow:0 0 0 3px rgba(26,43,94,.08)}
+textarea{resize:vertical;min-height:75px}
+.toggle-lbl{display:flex;align-items:center;gap:7px;cursor:pointer;font-size:13px;font-weight:400;text-transform:none;letter-spacing:0}
+.toggle-lbl input{width:auto;margin:0}
+
+/* PROJECT CARD */
+.proj-card{background:#fff;border-radius:12px;border:1px solid var(--border);margin-bottom:11px;overflow:hidden;transition:.2s}
+.proj-card:hover{box-shadow:0 4px 12px rgba(0,0,0,.1);border-color:var(--navy)}
+.proj-card-hdr{padding:15px 18px;display:flex;align-items:center;justify-content:space-between;cursor:pointer}
+.proj-name{font-size:15px;font-weight:700;color:var(--navy)}
+.proj-meta{font-size:12px;color:var(--gray);margin-top:3px;display:flex;gap:10px;flex-wrap:wrap}
+.proj-ftr{padding:9px 18px;background:var(--cream);border-top:1px solid var(--border);display:flex;gap:7px;align-items:center}
+
+/* CONTACT AVATAR */
+.c-avatar{width:34px;height:34px;border-radius:50%;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;flex-shrink:0}
+
+/* ACTIVITY */
+.act-item{display:flex;gap:10px;padding:11px 0;border-bottom:1px solid var(--border)}
+.act-item:last-child{border-bottom:none}
+.act-dot{width:7px;height:7px;border-radius:50%;background:var(--navy);margin-top:5px;flex-shrink:0}
+
+/* CHECKBOX DONE */
+.chk{width:20px;height:20px;border-radius:50%;border:2px solid var(--border);cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;transition:.2s}
+.chk:hover{border-color:var(--green)}
+.chk.done{background:var(--green);border-color:var(--green);color:#fff}
+
+/* SUB-TABS */
+.stab-bar{display:flex;gap:4px;margin-bottom:18px;background:#fff;padding:6px;border-radius:12px;border:1px solid var(--border)}
+.stab{padding:8px 18px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:500;color:var(--gd);transition:.15s;white-space:nowrap}
+.stab:hover{background:var(--cream)}
+.stab.active{background:var(--navy);color:#fff}
+.spanel{display:none}.spanel.active{display:block}
+
+/* LOGI CARDS */
+.logi-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:18px}
+.info-box{padding:14px 18px;border-radius:10px;font-size:13px;line-height:1.7}
+.info-box.gold{background:#fef9ec;border:1px solid #f5d87a}
+.info-box.green{background:#ecfdf5;border:1px solid #6ee7b7}
+.info-box.red{background:#fef2f2;border:1px solid #fca5a5}
+.info-box.blue{background:#eff6ff;border:1px solid #93c5fd}
+
+/* CARRIER STARS */
+.stars{color:#f59e0b;font-size:13px}
+
+/* CAPACITY TABLE */
+.cap-badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:700;min-width:36px;text-align:center}
+.cap-0{background:#fee2e2;color:#991b1b}
+.cap-low{background:#fef3c7;color:#92400e}
+.cap-mid{background:#d1fae5;color:#065f46}
+.cap-high{background:#dbeafe;color:#1d4ed8}
+.cap-xl{background:#ede9fe;color:#5b21b6}
+
+/* PARTNER MODEL */
+.model-card{border-radius:12px;padding:18px;margin-bottom:14px}
+.model1{background:linear-gradient(135deg,#1a2b5e 0%,#243570 100%);color:#fff}
+.model2{background:linear-gradient(135deg,#064e3b 0%,#065f46 100%);color:#fff}
+.model-title{font-size:16px;font-weight:800;margin-bottom:10px}
+.model-bullet{font-size:12px;opacity:.85;padding:2px 0}
+.model-profit{background:rgba(255,255,255,.15);padding:10px 14px;border-radius:8px;margin-top:10px;font-size:13px}
+
+/* PHASE TABLE */
+.phase-1{background:#eff6ff}
+.phase-2{background:#ecfdf5}
+.phase-3{background:#fdf4ff}
+
+/* EMPTY */
+.empty{text-align:center;padding:40px 20px;color:var(--gray)}
+.empty-ico{font-size:40px;margin-bottom:10px}
+
+/* DETAIL */
+.detail-hdr{background:var(--navy);color:#fff;padding:18px 22px;border-radius:12px;margin-bottom:18px}
+.detail-title{font-size:21px;font-weight:800}
+.detail-sub{font-size:12px;color:rgba(255,255,255,.6);margin-top:4px}
+.back-btn{display:inline-flex;align-items:center;gap:5px;color:var(--navy);cursor:pointer;font-size:13px;font-weight:600;margin-bottom:14px;padding:5px 0}
+.back-btn:hover{color:var(--gold)}
+
+/* TOAST */
+.toast{position:fixed;bottom:20px;right:20px;background:var(--navy);color:#fff;padding:11px 18px;border-radius:10px;font-size:13px;font-weight:500;z-index:300;transform:translateY(80px);opacity:0;transition:.3s}
+.toast.show{transform:translateY(0);opacity:1}
+
+/* DIVIDER */
+.div{height:1px;background:var(--border);margin:16px 0}
+
+/* CONTACT ROW */
+.cr{display:flex;align-items:center;gap:11px;padding:11px 0;border-bottom:1px solid var(--border)}
+.cr:last-child{border-bottom:none}
+
+/* REPORT */
+.rpt-hdr{background:var(--navy);color:#fff;padding:22px;border-radius:12px;margin-bottom:22px}
+
+@media(max-width:768px){
+  .stats-grid{grid-template-columns:1fr 1fr}
+  .fr{grid-template-columns:1fr}
+  .hdr-search{display:none}
+  .two-col{grid-template-columns:1fr !important}
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="hdr">
+  <div class="hdr-logo">
+    <div class="l1">CERAFIELD</div>
+    <div class="l2">Project Tracker</div>
+  </div>
+  <div class="hdr-search">
+    <input id="gSearch" placeholder="ค้นหาโครงการ หรือ ชื่อคน..." oninput="doGSearch()">
+  </div>
+  <div class="hdr-right">
+    <span class="hdr-date" id="hdrDate"></span>
+    <button class="btn btn-ghost btn-sm" style="color:rgba(255,255,255,.7);border-color:rgba(255,255,255,.2)" onclick="exportData()">💾 Export</button>
+    <button class="btn btn-ghost btn-sm" style="color:rgba(255,255,255,.7);border-color:rgba(255,255,255,.2)" onclick="document.getElementById('impFile').click()">📂 Import</button>
+    <input type="file" id="impFile" accept=".json" style="display:none" onchange="importData(event)">
+  </div>
+</div>
+
+<!-- NAV -->
+<div class="nav">
+  <div class="nav-tab active" onclick="showTab('dash')">🏠 ภาพรวม</div>
+  <div class="nav-tab" onclick="showTab('proj')">🏗️ โครงการ</div>
+  <div class="nav-tab" onclick="showTab('cont')">👥 ผู้ติดต่อ</div>
+  <div class="nav-tab" onclick="showTab('act')">📋 กิจกรรม</div>
+  <div class="nav-tab" onclick="showTab('rpt')">📊 รายงาน</div>
+  <div class="nav-tab" onclick="showTab('logi')">📦 โลจิสติกส์</div>
+</div>
+
+<div class="main">
+
+<!-- ===== DASHBOARD ===== -->
+<div id="panel-dash" class="panel active">
+  <div class="stats-grid" id="statsGrid"></div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px" class="two-col">
+    <div class="card">
+      <div class="sec-hdr"><div class="sec-title">🔔 ต้องตาม / Follow up</div></div>
+      <div id="fuList"></div>
+    </div>
+    <div class="card">
+      <div class="sec-hdr"><div class="sec-title">🕐 กิจกรรมล่าสุด</div></div>
+      <div id="recentActs"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== PROJECTS ===== -->
+<div id="panel-proj" class="panel">
+  <div id="proj-list-view">
+    <div class="sec-hdr">
+      <div class="sec-title">🏗️ โครงการทั้งหมด</div>
+      <button class="btn btn-primary" onclick="openProjModal()">+ เพิ่มโครงการ</button>
+    </div>
+    <div id="projList"></div>
+  </div>
+  <div id="proj-detail-view" style="display:none">
+    <div class="back-btn" onclick="showProjList()">← กลับรายการโครงการ</div>
+    <div id="projDetail"></div>
+  </div>
+</div>
+
+<!-- ===== CONTACTS ===== -->
+<div id="panel-cont" class="panel">
+  <div class="sec-hdr">
+    <div class="sec-title">👥 ผู้ติดต่อทั้งหมด</div>
+    <button class="btn btn-primary" onclick="openContModal()">+ เพิ่มผู้ติดต่อ</button>
+  </div>
+  <div class="card">
+    <input id="contSearch" placeholder="ค้นหา ชื่อ, บริษัท, โครงการ..." style="margin-bottom:14px" oninput="renderConts()">
+    <div id="contTable"></div>
+  </div>
+</div>
+
+<!-- ===== ACTIVITIES ===== -->
+<div id="panel-act" class="panel">
+  <div class="sec-hdr">
+    <div class="sec-title">📋 ประวัติกิจกรรมทั้งหมด</div>
+    <button class="btn btn-primary" onclick="openActModal()">+ บันทึกกิจกรรม</button>
+  </div>
+  <div class="card">
+    <div id="actTable"></div>
+  </div>
+</div>
+
+<!-- ===== REPORT ===== -->
+<div id="panel-rpt" class="panel">
+  <div class="rpt-hdr">
+    <div style="font-size:11px;color:var(--gold);letter-spacing:1px;margin-bottom:6px">CERAFIELD INTERNATIONAL (THAILAND)</div>
+    <div style="font-size:22px;font-weight:800">Sales Progress Report</div>
+    <div style="font-size:13px;color:rgba(255,255,255,.55);margin-top:4px">Account Executive: Nantapat Pukchanka</div>
+    <div style="font-size:12px;color:rgba(255,255,255,.35);margin-top:8px" id="rptDate"></div>
+  </div>
+  <div id="rptContent"></div>
+</div>
+
+
+<!-- ===== LOGISTICS ===== -->
+<div id="panel-logi" class="panel">
+  <div class="stab-bar">
+    <div class="stab active" onclick="showStab('s-ship')">🚚 ค่าขนส่ง & ผู้ให้บริการ</div>
+    <div class="stab" onclick="showStab('s-veh')">🚛 ความจุรถ Deliveree</div>
+    <div class="stab" onclick="showStab('s-partner')">🤝 โมเดลพาร์ทเนอร์</div>
+    <div class="stab" onclick="showStab('s-advice')">💡 คำแนะนำ & สัญญา</div>
+  </div>
+
+  <!-- ─── SUB 1: SHIPPING ─── -->
+  <div id="s-ship" class="spanel active">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:18px" class="two-col">
+
+      <!-- Products -->
+      <div class="card">
+        <div class="sec-hdr"><div class="sec-title">📦 สินค้าที่ต้องส่ง</div></div>
+        <div class="tbl-wrap"><table>
+          <thead><tr><th>รหัสสินค้า</th><th>ประเภท</th><th>ขนาด กล่อง (มม.)</th><th>น้ำหนัก</th></tr></thead>
+          <tbody>
+            <tr><td><b>CF-13022</b></td><td>โถสุขภัณฑ์ One-Piece</td><td>710 × 410 × 605</td><td>50 กก.</td></tr>
+            <tr><td><b>CF-2493</b></td><td>โถสุขภัณฑ์ One-Piece</td><td>690 × 360 × 738</td><td>50 กก.</td></tr>
+            <tr><td><b>CF-4037</b></td><td>โถปัสสาวะ (Urinal)</td><td>300 × 335 × 690</td><td>~15 กก.</td></tr>
+            <tr><td><b>CF-U622</b></td><td>ราวจับผู้สูงอายุ (U-Bar)</td><td>622 มม. ยาว</td><td>~2 กก.</td></tr>
+          </tbody>
+        </table></div>
+        <div class="info-box gold" style="margin-top:12px;font-size:12px">
+          ⚠️ โถสุขภัณฑ์ 50 กก. — Courier ทั่วไปใช้ไม่ได้ Kerry รับแค่ 30 กก., Flash/J&T รับ 50 กก. แต่ระบบ Hub สายพานทำให้แตกง่ายมาก ต้องใช้ขนส่งสินค้าหนักเท่านั้น
+        </div>
+      </div>
+
+      <!-- Packaging -->
+      <div class="card">
+        <div class="sec-hdr"><div class="sec-title">📋 มาตรฐานบรรจุภัณฑ์</div></div>
+        <div class="tbl-wrap"><table>
+          <thead><tr><th>ระดับ</th><th>ใช้กับ</th><th>วิธีบรรจุ</th><th>ต้นทุน/ชิ้น</th></tr></thead>
+          <tbody>
+            <tr style="background:#fff0f0">
+              <td><b style="color:#991b1b">ระดับ 3</b><br><span style="font-size:10px;color:#991b1b">บังคับ</span></td>
+              <td>โถสุขภัณฑ์ 50 กก.</td>
+              <td style="font-size:12px">ห่อ PE Foam 5–8 มม. + โฟม EPS ทุกมุม + กล่องลูกฟูก 2–3 ชั้น + ยืด Stretch Wrap + สติ๊กเกอร์ FRAGILE ทุกด้าน</td>
+              <td><b>80–150 บาท</b></td>
+            </tr>
+            <tr>
+              <td><b style="color:#b45309">ระดับ 2</b></td>
+              <td>Urinal ~20 กก.</td>
+              <td style="font-size:12px">PE Foam + มุม EPS + กล่องลูกฟูก 2 ชั้น + สติ๊กเกอร์ Fragile</td>
+              <td><b>40–70 บาท</b></td>
+            </tr>
+            <tr>
+              <td><b style="color:#065f46">ระดับ 1</b></td>
+              <td>ราวจับ ~2 กก.</td>
+              <td style="font-size:12px">Bubble Wrap + กล่องลูกฟูกทั่วไป</td>
+              <td><b>15–30 บาท</b></td>
+            </tr>
+          </tbody>
+        </table></div>
+        <div class="info-box blue" style="margin-top:12px;font-size:12px">
+          💡 ถ้าส่งตั้งแต่ 5 ชิ้นขึ้นไปในออเดอร์เดียว ต้องวางบนพาเลทเสมอ — พาเลทมาตรฐานไทย 1,100 × 1,100 มม. วางโถสุขภัณฑ์ได้ 4–6 ชิ้น ตามความเสียหายระหว่างขนส่งได้มาก
+        </div>
+      </div>
+    </div>
+
+    <!-- Carrier comparison -->
+    <div class="card" style="margin-bottom:18px">
+      <div class="sec-hdr"><div class="sec-title">🏢 เปรียบเทียบผู้ให้บริการขนส่ง</div></div>
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>ผู้ให้บริการ</th><th>ประเภท</th><th>น้ำหนักสูงสุด</th><th>เหมาะโถ 50 กก.</th><th>COD</th><th>Tracking</th><th>คะแนน</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><b>SCG JWD</b></td><td style="font-size:12px">B2B Integrated Logistics</td><td>ไม่จำกัด</td>
+            <td><span class="badge b-interested">✓ ดีมาก</span></td>
+            <td style="font-size:12px">ตามสัญญา</td><td style="font-size:12px">✓ ดีมาก</td>
+            <td><span class="stars">★★★★★</span></td>
+          </tr>
+          <tr>
+            <td><b>Yamato Unyu</b></td><td style="font-size:12px">Premium / บอมบาง</td><td>ไม่จำกัด</td>
+            <td><span class="badge b-interested">✓ ดีที่สุด</span></td>
+            <td style="font-size:12px;color:var(--gray)">ไม่มี</td><td style="font-size:12px">✓ ดีมาก</td>
+            <td><span class="stars">★★★★★</span><span style="font-size:10px;color:var(--gray)">*</span></td>
+          </tr>
+          <tr>
+            <td><b>Deliveree</b></td><td style="font-size:12px">เช่ารถ On-Demand</td><td>500–25,000 กก.</td>
+            <td><span class="badge b-catalog">✓ ดี</span></td>
+            <td style="font-size:12px;color:var(--gray)">ไม่มี</td><td style="font-size:12px">GPS Live</td>
+            <td><span class="stars">★★★★</span></td>
+          </tr>
+          <tr>
+            <td><b>NIM Express</b></td><td style="font-size:12px">ขนส่งสินค้าหนัก</td><td>~150 กก.</td>
+            <td><span class="badge b-catalog">✓ ดี</span></td>
+            <td style="font-size:12px"><span class="badge b-interested" style="font-size:11px">✓ มี</span></td><td style="font-size:12px">พื้นฐาน</td>
+            <td><span class="stars">★★★★</span></td>
+          </tr>
+          <tr>
+            <td><b>Lalamove</b></td><td style="font-size:12px">เช่ารถ On-Demand</td><td>ถึง 3 ตัน</td>
+            <td><span class="badge b-catalog">✓ ดี</span></td>
+            <td style="font-size:12px;color:var(--gray)">ไม่มี</td><td style="font-size:12px">GPS Live</td>
+            <td><span class="stars">★★★</span></td>
+          </tr>
+          <tr>
+            <td><b>BEST Express</b></td><td style="font-size:12px">Courier พัสดุ</td><td>110 กก.</td>
+            <td><span class="badge b-followup" style="background:#fef3c7;color:#92400e">⚠️ พอได้</span></td>
+            <td style="font-size:12px"><span class="badge b-interested" style="font-size:11px">✓ มี</span></td><td style="font-size:12px">✓</td>
+            <td><span class="stars">★★</span></td>
+          </tr>
+          <tr>
+            <td><b>Flash Express</b></td><td style="font-size:12px">Courier พัสดุ</td><td>100 กก.</td>
+            <td><span class="badge b-lost">✗ ไม่แนะนำ</span></td>
+            <td style="font-size:12px"><span class="badge b-interested" style="font-size:11px">✓ มี</span></td><td style="font-size:12px">✓</td>
+            <td><span class="stars">★</span></td>
+          </tr>
+          <tr>
+            <td><b>Kerry Express</b></td><td style="font-size:12px">Courier พัสดุ</td><td>30 กก.</td>
+            <td><span class="badge b-lost">✗ รับไม่ได้</span></td>
+            <td style="font-size:12px"><span class="badge b-interested" style="font-size:11px">✓ มี</span></td><td style="font-size:12px;color:var(--gray)">✗</td>
+            <td><span class="stars">★</span></td>
+          </tr>
+        </tbody>
+      </table></div>
+      <div style="font-size:11px;color:var(--gray);margin-top:8px">* Yamato Unyu ดีที่สุดแต่แพงที่สุด แนะนำเฉพาะโปรเจค Hotel Luxury เท่านั้น</div>
+    </div>
+
+    <!-- Route pricing -->
+    <div class="card" style="margin-bottom:18px">
+      <div class="sec-hdr">
+        <div class="sec-title">💰 ราคาขนส่งโดยประมาณ — ส่งจากระยอง (ต่อโถสุขภัณฑ์ 50 กก.)</div>
+      </div>
+      <div class="tbl-wrap"><table>
+        <thead><tr>
+          <th>เส้นทาง</th><th>ระยะทาง</th>
+          <th>SCG JWD<br><span style="font-weight:400;text-transform:none">(LTL/ชิ้น)</span></th>
+          <th>Deliveree<br><span style="font-weight:400;text-transform:none">(เหมาคัน/เที่ยว)</span></th>
+          <th>NIM Express<br><span style="font-weight:400;text-transform:none">(LTL/ชิ้น)</span></th>
+          <th style="color:#ef4444">Flash Express<br><span style="font-weight:400;color:#ef4444;text-transform:none">(⚠️ ไม่แนะนำ)</span></th>
+        </tr></thead>
+        <tbody>
+          <tr>
+            <td><b>ระยอง → กรุงเทพฯ</b></td><td style="color:var(--gray);font-size:12px">~180 กม.</td>
+            <td>2,500–4,000</td><td>5,500–6,500</td>
+            <td><b style="color:#065f46">350–550</b></td><td style="color:#b91c1c">200–350</td>
+          </tr>
+          <tr>
+            <td><b>ระยอง → เชียงใหม่</b></td><td style="color:var(--gray);font-size:12px">~700 กม.</td>
+            <td>4,500–7,000</td><td>14,000–18,000</td>
+            <td><b style="color:#065f46">800–1,200</b></td><td style="color:#b91c1c">500–700</td>
+          </tr>
+          <tr>
+            <td><b>ระยอง → ขอนแก่น</b></td><td style="color:var(--gray);font-size:12px">~500 กม.</td>
+            <td>3,500–5,500</td><td>10,000–13,000</td>
+            <td><b style="color:#065f46">700–1,000</b></td><td style="color:#b91c1c">400–600</td>
+          </tr>
+          <tr>
+            <td><b>ระยอง → ภูเก็ต</b></td><td style="color:var(--gray);font-size:12px">~900 กม.</td>
+            <td>5,000–8,000</td><td>18,000–22,000</td>
+            <td><b style="color:#065f46">1,000–1,500</b></td><td style="color:#b91c1c">600–900</td>
+          </tr>
+          <tr>
+            <td><b>ระยอง → ยะลา</b></td><td style="color:var(--gray);font-size:12px">~1,100 กม.</td>
+            <td>6,000–9,000</td><td>22,000–27,000</td>
+            <td><b style="color:#065f46">1,200–1,800</b></td><td style="color:#b91c1c">700–1,000</td>
+          </tr>
+        </tbody>
+      </table></div>
+      <div class="info-box gold" style="margin-top:12px;font-size:12px">
+        💡 ราคา Deliveree คือ "เหมาคัน" — ถ้าส่ง 8+ ชิ้น/เที่ยว จะถูกกว่า NIM Express ต่อชิ้น / ราคาทั้งหมดเป็นการประมาณการ ต้องขอใบเสนอราคาจริงก่อนใช้งาน
+      </div>
+    </div>
+
+    <!-- Decision guide -->
+    <div class="card">
+      <div class="sec-hdr"><div class="sec-title">🎯 เลือกใช้ขนส่งไหน — ตามสถานการณ์</div></div>
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>สถานการณ์</th><th>แนะนำให้ใช้</th><th>ราคาโดยประมาณ</th><th>เหตุผล</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>ลูกค้าปลีก 1 ชิ้น</td>
+            <td><span class="badge b-contacted">NIM Express</span></td>
+            <td>350–1,500 บาท</td>
+            <td style="font-size:12px">ขนส่งหนัก มี COD ราคาสมเหตุสมผล</td>
+          </tr>
+          <tr>
+            <td>ดีเลอร์ 3–10 ชิ้น</td>
+            <td><span class="badge b-catalog">Deliveree เหมาคัน</span></td>
+            <td>2,000–6,500 บาท</td>
+            <td style="font-size:12px">หารร่วม ถูกกว่าส่งทีละชิ้น</td>
+          </tr>
+          <tr>
+            <td>โปรเจค 20 ชิ้นขึ้นไป</td>
+            <td><span class="badge b-interested">SCG JWD Logistics</span></td>
+            <td>ทำสัญญาราคา</td>
+            <td style="font-size:12px">เชี่ยวชาญ B2B Project มีทีม</td>
+          </tr>
+          <tr>
+            <td>โรงแรม / คอนโดหรู</td>
+            <td><span class="badge b-interested">SCG JWD + Yamato</span></td>
+            <td>Premium rate</td>
+            <td style="font-size:12px">White-Glove ส่งถึงห้อง</td>
+          </tr>
+          <tr>
+            <td>ราวจับเท่านั้น (&lt;5 กก.)</td>
+            <td><span class="badge r-other">Kerry / Flash</span></td>
+            <td>60–200 บาท</td>
+            <td style="font-size:12px">ของเบา ไม่แตก Courier พอ</td>
+          </tr>
+          <tr>
+            <td>Urinal เท่านั้น (~20 กก.)</td>
+            <td><span class="badge b-catalog">NIM Express / BEST</span></td>
+            <td>180–600 บาท</td>
+            <td style="font-size:12px">น้ำหนักพอดี Courier รับได้</td>
+          </tr>
+        </tbody>
+      </table></div>
+      <div class="info-box green" style="margin-top:12px;font-size:12px">
+        ✅ คำแนะนำ: เปิด Business Account กับ <b>SCG JWD</b> (สำหรับโปรเจค) และ <b>Deliveree</b> (สำหรับดีเลอร์) โดยเร็ว — ราคาสัญญารายปีถูกกว่าราคา spot ประมาณ 15–25% | ซื้อประกันสินค้าเพิ่มทุกครั้งที่ส่งโถสุขภัณฑ์ — ค่าประกันประมาณ 0.5–1.5% ของมูลค่าสินค้า
+      </div>
+    </div>
+  </div><!-- /s-ship -->
+
+  <!-- ─── SUB 2: VEHICLE CAPACITY ─── -->
+  <div id="s-veh" class="spanel">
+    <!-- Box specs -->
+    <div class="card" style="margin-bottom:16px">
+      <div class="sec-hdr"><div class="sec-title">📐 ขนาดกล่องบรรจุภัณฑ์ CERAFIELD</div></div>
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>ระดับ</th><th>สินค้า</th><th>กล่อง: กว้าง × ลึก × สูง (ซม.)</th><th>น้ำหนัก</th></tr></thead>
+        <tbody>
+          <tr><td><b>XL</b></td><td>One-Piece Toilet</td><td>87 × 62 × 96 ซม.</td><td>48 กก.</td></tr>
+          <tr><td><b>L</b></td><td>Two-Piece Toilet</td><td>83 × 57 × 86 ซม.</td><td>40 กก.</td></tr>
+          <tr><td><b>M</b></td><td>Urinal</td><td>64 × 51 × 88 ซม.</td><td>14 กก.</td></tr>
+          <tr><td><b>S</b></td><td>Wall-Hung Bowl</td><td>68 × 53 × 48 ซม.</td><td>12 กก.</td></tr>
+          <tr><td><b>XS</b></td><td>Safety Rail</td><td>72 × 13 × 10 ซม.</td><td>3 กก.</td></tr>
+        </tbody>
+      </table></div>
+      <div class="info-box blue" style="margin-top:12px;font-size:12px">
+        💡 ความสูงบรรจุ: วางซ้อนได้สูงสุด 2 ชั้น ตามมาตรฐาน CERAFIELD เพื่อป้องกันความเสียหาย
+      </div>
+    </div>
+
+    <!-- Vehicle capacity matrix -->
+    <div class="card" style="margin-bottom:16px">
+      <div class="sec-hdr">
+        <div class="sec-title">🚛 ความจุรถ Deliveree — จำนวนชิ้นต่อเที่ยว (ประมาณการ)</div>
+      </div>
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>ประเภทรถ</th>
+              <th>พื้นที่บรรจุ (ซม.)</th>
+              <th>น้ำหนักรับ</th>
+              <th>ราคา/เที่ยว*</th>
+              <th style="background:#dbeafe;color:#1d4ed8">XL One-Piece</th>
+              <th style="background:#d1fae5;color:#065f46">L Two-Piece</th>
+              <th style="background:#fef3c7;color:#92400e">M Urinal</th>
+              <th style="background:#ede9fe;color:#5b21b6">S Wall-Hung</th>
+              <th style="background:#f3f4f6;color:#374151">XS Safety Rail</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><b>อีโคคาร์</b></td><td style="font-size:12px;color:var(--gray)">100×90×75</td><td style="font-size:12px">700 กก.</td><td style="font-size:12px">~150 ฿</td>
+              <td><span class="cap-badge cap-low">1</span></td><td><span class="cap-badge cap-low">1</span></td><td><span class="cap-badge cap-low">1</span></td><td><span class="cap-badge cap-low">2</span></td><td><span class="cap-badge cap-high">63</span></td>
+            </tr>
+            <tr>
+              <td><b>รถขนาดใหญ่ (อีโคคาร์)</b></td><td style="font-size:12px;color:var(--gray)">160×130×75</td><td style="font-size:12px">1,500 กก.</td><td style="font-size:12px">~300 ฿</td>
+              <td><span class="cap-badge cap-low">1</span></td><td><span class="cap-badge cap-low">1</span></td><td><span class="cap-badge cap-low">3</span></td><td><span class="cap-badge cap-mid">6</span></td><td><span class="cap-badge cap-high">160</span></td>
+            </tr>
+            <tr>
+              <td><b>ปิคอัพ (กระบะเปิด)</b></td><td style="font-size:12px;color:var(--gray)">180×150×90</td><td style="font-size:12px">2,400 กก.</td><td style="font-size:12px">~1,000 ฿</td>
+              <td><span class="cap-badge cap-low">2</span></td><td><span class="cap-badge cap-low">4</span></td><td><span class="cap-badge cap-mid">6</span></td><td><span class="cap-badge cap-mid">9</span></td><td><span class="cap-badge cap-high">198</span></td>
+            </tr>
+            <tr>
+              <td><b>กระบะตู้ทึบ 1.8 ม.</b></td><td style="font-size:12px;color:var(--gray)">180×150×180</td><td style="font-size:12px">4,800 กก.</td><td style="font-size:12px">~1,500 ฿</td>
+              <td><span class="cap-badge cap-mid">4</span></td><td><span class="cap-badge cap-mid">8</span></td><td><span class="cap-badge cap-mid">12</span></td><td><span class="cap-badge cap-mid">18</span></td><td><span class="cap-badge cap-xl">396</span></td>
+            </tr>
+            <tr>
+              <td><b>กระบะตู้ทึบ 2.1 ม.</b></td><td style="font-size:12px;color:var(--gray)">220×150×210</td><td style="font-size:12px">6,900 กก.</td><td style="font-size:12px">~1,500 ฿</td>
+              <td><span class="cap-badge cap-mid">8</span></td><td><span class="cap-badge cap-mid">8</span></td><td><span class="cap-badge cap-high">16</span></td><td><span class="cap-badge cap-high">24</span></td><td><span class="cap-badge cap-xl">484</span></td>
+            </tr>
+            <tr style="background:#f0fdf4">
+              <td><b>รถ 6 ล้อ</b></td><td style="font-size:12px;color:var(--gray)">500×220×220</td><td style="font-size:12px">24,000 กก.</td><td style="font-size:12px">~5,000 ฿</td>
+              <td><span class="cap-badge cap-high">32</span></td><td><span class="cap-badge cap-high">36</span></td><td><span class="cap-badge cap-high">56</span></td><td><span class="cap-badge cap-high">80</span></td><td><span class="cap-badge cap-xl">1,672</span></td>
+            </tr>
+            <tr style="background:#f0fdf4">
+              <td><b>รถ 6 ล้อขนาดใหญ่</b></td><td style="font-size:12px;color:var(--gray)">700×220×220</td><td style="font-size:12px">33,000 กก.</td><td style="font-size:12px">~5,000 ฿</td>
+              <td><span class="cap-badge cap-high">48</span></td><td><span class="cap-badge cap-high">48</span></td><td><span class="cap-badge cap-high">80</span></td><td><span class="cap-badge cap-xl">112</span></td><td><span class="cap-badge cap-xl">2,332</span></td>
+            </tr>
+            <tr style="background:#eff6ff">
+              <td><b>รถ 10 ล้อ</b></td><td style="font-size:12px;color:var(--gray)">600×230×230</td><td style="font-size:12px">31,000 กก.</td><td style="font-size:12px">~14,000 ฿</td>
+              <td><span class="cap-badge cap-high">36</span></td><td><span class="cap-badge cap-high">56</span></td><td><span class="cap-badge cap-high">72</span></td><td><span class="cap-badge cap-high">96</span></td><td><span class="cap-badge cap-xl">2,116</span></td>
+            </tr>
+            <tr style="background:#eff6ff">
+              <td><b>รถ 10 ล้อขนาดใหญ่</b></td><td style="font-size:12px;color:var(--gray)">700×230×230</td><td style="font-size:12px">37,000 กก.</td><td style="font-size:12px">~12,000 ฿</td>
+              <td><span class="cap-badge cap-high">48</span></td><td><span class="cap-badge cap-high">64</span></td><td><span class="cap-badge cap-high">80</span></td><td><span class="cap-badge cap-xl">112</span></td><td><span class="cap-badge cap-xl">2,438</span></td>
+            </tr>
+            <tr style="background:#fdf4ff">
+              <td><b>เทรลเลอร์</b></td><td style="font-size:12px;color:var(--gray)">1200×250×280</td><td style="font-size:12px">84,000 กก.</td><td style="font-size:12px">~32,000 ฿</td>
+              <td><span class="cap-badge cap-xl">104</span></td><td><span class="cap-badge cap-xl">126</span></td><td><span class="cap-badge cap-xl">144</span></td><td><span class="cap-badge cap-xl">220</span></td><td><span class="cap-badge cap-xl">4,600</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;font-size:12px">
+        <span><span class="cap-badge cap-low" style="font-size:11px">1–9</span> น้อย</span>
+        <span><span class="cap-badge cap-mid" style="font-size:11px">10–29</span> พอดี</span>
+        <span><span class="cap-badge cap-high" style="font-size:11px">30–99</span> ดี</span>
+        <span><span class="cap-badge cap-xl" style="font-size:11px">100+</span> เต็มคัน</span>
+        <span style="color:var(--gray);margin-left:8px">* ราคาโดยประมาณ ขึ้นอยู่กับเส้นทาง / ต้องขอราคาจริงจาก Deliveree App</span>
+      </div>
+    </div>
+
+    <!-- Quick guide -->
+    <div class="card">
+      <div class="sec-hdr"><div class="sec-title">📊 แนะนำรถตามจำนวนโถสุขภัณฑ์ XL</div></div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px" class="two-col">
+        <div class="info-box blue" style="text-align:center">
+          <div style="font-size:24px;font-weight:900;color:var(--navy)">1–4</div>
+          <div style="font-size:12px;font-weight:700;margin:4px 0">กระบะตู้ทึบ 1.8–2.1 ม.</div>
+          <div style="font-size:11px;color:var(--gd)">~1,500 ฿/เที่ยว</div>
+        </div>
+        <div class="info-box green" style="text-align:center">
+          <div style="font-size:24px;font-weight:900;color:#065f46">5–35</div>
+          <div style="font-size:12px;font-weight:700;margin:4px 0">รถ 6 ล้อ</div>
+          <div style="font-size:11px;color:var(--gd)">~5,000 ฿/เที่ยว</div>
+        </div>
+        <div class="info-box" style="text-align:center;background:#fdf4ff;border:1px solid #e9d5ff">
+          <div style="font-size:24px;font-weight:900;color:#7c3aed">36–100+</div>
+          <div style="font-size:12px;font-weight:700;margin:4px 0">รถ 10 ล้อ / เทรลเลอร์</div>
+          <div style="font-size:11px;color:var(--gd)">12,000–32,000 ฿/เที่ยว</div>
+        </div>
+      </div>
+    </div>
+  </div><!-- /s-veh -->
+
+  <!-- ─── SUB 3: PARTNER MODELS ─── -->
+  <div id="s-partner" class="spanel">
+
+    <!-- Model cards -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:18px" class="two-col">
+      <div class="model-card model1">
+        <div class="model-title">📦 โมเดล 1 — ราคา Project / ดีเลอร์</div>
+        <div class="model-bullet">✓ เราขายให้เพื่อนในราคา Project (ราคาส่ง)</div>
+        <div class="model-bullet">✓ ราคารวมค่าส่งถึงบูเพื่อนแล้ว</div>
+        <div class="model-bullet">✓ เพื่อนรับของไป — ถือว่าเป็นของเพื่อนแล้ว</div>
+        <div class="model-bullet">✓ เพื่อนกำหนดราคาขายและส่วนลดเอง</div>
+        <div class="model-bullet">✓ เพื่อนจัดการขาย / ส่งของ / ลูกค้าเอง</div>
+        <div class="model-profit">
+          <div style="font-size:11px;opacity:.7;margin-bottom:4px">ตัวอย่างกำไรของเพื่อน:</div>
+          <div>ปลีก 10,800 → Project 6,880 → <b>ได้ 3,920 บาท (36%)</b></div>
+          <div>ปลีก 15,280 → Project 6,480 → <b>ได้ 8,800 บาท (58%)</b></div>
+        </div>
+      </div>
+      <div class="model-card model2">
+        <div class="model-title">💼 โมเดล 2 — Commission Agent 20%</div>
+        <div class="model-bullet">✓ เพื่อนไม่ต้องลงทุนสินค้า — ไม่ลงทุน</div>
+        <div class="model-bullet">✓ ราคาขายต้องเป็นราคาปลีกเท่านั้น</div>
+        <div class="model-bullet">✓ เพื่อนได้ค่าคอม 20% ของราคาปลีกทุกออเดอร์</div>
+        <div class="model-bullet">✓ เราจัดส่งถึงลูกค้าโดยตรง</div>
+        <div class="model-bullet">✓ เพื่อนโทรแค่หาลูกค้า + ปิดการขาย</div>
+        <div class="model-profit">
+          <div style="font-size:11px;opacity:.7;margin-bottom:4px">ตัวอย่างค่าคอม (20%):</div>
+          <div>ปลีก 10,800 → <b>ได้ 2,160 บาท</b></div>
+          <div>ปลีก 15,280 → <b>ได้ 3,056 บาท</b></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Profit comparison -->
+    <div class="card" style="margin-bottom:18px">
+      <div class="sec-hdr"><div class="sec-title">📊 วิเคราะห์กำไรจริง — เพื่อนได้เท่าไรใน 2 โมเดล</div></div>
+      <div class="tbl-wrap"><table>
+        <thead><tr>
+          <th>ราคาปลีก</th><th>ราคา Project</th>
+          <th>กำไร M1 (บาท)</th><th>กำไร M1 (%)</th>
+          <th>ค่าคอม M2 (บาท)</th><th>ค่าคอม M2 (%)</th>
+          <th>M1 ได้มากกว่า M2</th>
+        </tr></thead>
+        <tbody>
+          <tr>
+            <td>10,800</td><td>6,880</td>
+            <td><b>3,920</b></td><td><span class="badge b-interested">36.3%</span></td>
+            <td>2,160</td><td><span class="badge b-catalog">20%</span></td>
+            <td><b style="color:#065f46">+1,760 บาท</b></td>
+          </tr>
+          <tr>
+            <td>8,580</td><td>5,980</td>
+            <td><b>2,600</b></td><td><span class="badge b-interested">30.3%</span></td>
+            <td>1,716</td><td><span class="badge b-catalog">20%</span></td>
+            <td><b style="color:#065f46">+884 บาท</b></td>
+          </tr>
+          <tr>
+            <td>12,800</td><td>8,880</td>
+            <td><b>3,920</b></td><td><span class="badge b-interested">30.6%</span></td>
+            <td>2,560</td><td><span class="badge b-catalog">20%</span></td>
+            <td><b style="color:#065f46">+1,360 บาท</b></td>
+          </tr>
+          <tr>
+            <td>15,280</td><td>6,480</td>
+            <td><b>8,800</b></td><td><span class="badge b-interested">57.6%</span></td>
+            <td>3,056</td><td><span class="badge b-catalog">20%</span></td>
+            <td><b style="color:#065f46">+5,744 บาท</b></td>
+          </tr>
+        </tbody>
+      </table></div>
+      <div style="font-size:11px;color:var(--gray);margin-top:8px">โมเดล 1 ให้กำไรสูงกว่าเสมอ แต่เพื่อนต้องลงทุนซื้อของก่อน และรับความเสี่ยงถ้าขายไม่ได้</div>
+    </div>
+
+    <!-- Pros/cons -->
+    <div class="card">
+      <div class="sec-hdr"><div class="sec-title">⚖️ ข้อดี ข้อเสีย ของแต่ละโมเดล</div></div>
+      <div class="tbl-wrap"><table>
+        <thead><tr><th></th><th>โมเดล 1 — ราคา Project</th><th>โมเดล 2 — Commission</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><b style="color:#065f46">ข้อดี<br>สำหรับเรา</b></td>
+            <td style="font-size:12px">✓ รับเงินทันที ไม่มีความเสี่ยง<br>✓ ไม่ต้องลงทุนสต็อกสินค้า<br>✓ เพื่อนขยันขายเพราะกำไรตัวเอง<br>✓ คาดการณ์รายได้ง่ายกว่า</td>
+            <td style="font-size:12px">✓ ควบคุมราคาและ Brand ได้ 100%<br>✓ ข้อมูลลูกค้าอยู่กับเรา<br>✓ ไม่มีปัญหาตัดราคาระหว่างพาร์ทเนอร์<br>✓ ขยาย Partner ง่ายโดยไม่ conflict</td>
+          </tr>
+          <tr>
+            <td><b style="color:#991b1b">ข้อเสีย<br>สำหรับเรา</b></td>
+            <td style="font-size:12px">✗ ควบคุมราคาตลาดไม่ได้ เพื่อนกำหนดเอง<br>✗ เสี่ยงราคาตลาดพัง Brand เสียหาย<br>✗ เพื่อนอาจของแข่งคู่แข่งกัน</td>
+            <td style="font-size:12px">✗ ต้องส่งของทุกออเดอร์ — ค่าขนส่งเยอะ<br>✗ Commission 20% อาจทำให้เพื่อนไม่ motivated<br>✗ ถ้าเราส่งช้า ซื้อเสียเพื่อนเสีย</td>
+          </tr>
+          <tr>
+            <td><b style="color:#065f46">ข้อดี<br>สำหรับเพื่อน</b></td>
+            <td style="font-size:12px">✓ กำไรสูงสุด 30–58% ของราคาปลีก<br>✓ อิสระเต็ม กำหนดราคา ส่วนลด ได้เอง<br>✓ ไม่ต้องลอง order</td>
+            <td style="font-size:12px">✓ ไม่ต้องลงทุนซื้อสินค้าเลย<br>✓ ไม่มีความเสี่ยงสต็อกค้าง<br>✓ โฟกัสแค่ขาย ไม่ยุ่งเรื่องส่งของ</td>
+          </tr>
+          <tr>
+            <td><b style="color:#991b1b">ข้อเสีย<br>สำหรับเพื่อน</b></td>
+            <td style="font-size:12px">✗ ต้องใช้เงินตัวเองซื้อของก่อน<br>✗ ถ้าขายไม่ได้ขาดทุนตัวเอง<br>✗ รับผิดชอบถ้าของแตกหลังรับของ</td>
+            <td style="font-size:12px">✗ ได้แค่ 20% — น้อยกว่าโมเดล 1 มาก<br>✗ ต่อรองราคากับลูกค้าไม่ได้<br>✗ ลูกค้าอาจข้ามเพื่อน ติดต่อเราโดยตรง</td>
+          </tr>
+        </tbody>
+      </table></div>
+    </div>
+  </div><!-- /s-partner -->
+
+  <!-- ─── SUB 4: RECOMMENDATIONS ─── -->
+  <div id="s-advice" class="spanel">
+
+    <!-- Hybrid plan -->
+    <div class="card" style="margin-bottom:18px">
+      <div class="sec-hdr"><div class="sec-title">🔀 แผน Hybrid — เริ่มง่าย ขยับตามผลงาน</div></div>
+      <div style="font-size:13px;color:var(--gd);margin-bottom:14px">แบรนด์ใหญ่ในไทยอย่าง American Standard, COTTO, Kohler ไม่ได้เปิด Dealer ทันที — ทดสอบก่อนเสมอ เราควรทำแบบเดียวกัน คือเริ่มจาก Commission แล้วค่อย Upgrade เป็น Dealer เมื่อพิสูจน์ตัวเองได้</div>
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>ระยะ</th><th>ช่วงเวลา</th><th>โมเดล</th><th>ค่าคอม / Margin</th><th>เป้าขาย/เดือน</th><th>เงื่อนไข</th></tr></thead>
+        <tbody>
+          <tr class="phase-1">
+            <td><b style="color:#1d4ed8">ระยะ 1<br>ทดสอบ</b></td>
+            <td>เดือน 1–3</td>
+            <td>Commission (โมเดล 2)</td>
+            <td><b>25%</b> ของราคาปลีก</td>
+            <td style="color:var(--gray)">ยังไม่ต้องมี</td>
+            <td style="font-size:12px">เราให้ Display ฟรี 2–3 ชิ้น เพื่อดูว่าเพื่อนมีลูกค้าจริงไหม</td>
+          </tr>
+          <tr class="phase-2">
+            <td><b style="color:#065f46">ระยะ 2<br>เติบโต</b></td>
+            <td>เดือน 4–6</td>
+            <td>Hybrid (Commission + Stock บางรุ่น)</td>
+            <td>Commission 20% + Margin 30–37% ของ stock</td>
+            <td><b>60,000 บาท</b></td>
+            <td style="font-size:12px">ถ้าระยะ 1 เฉลี่ย &gt;40,000/เดือน เพื่อนซื้อ Display Stock บางรุ่น</td>
+          </tr>
+          <tr class="phase-3">
+            <td><b style="color:#7c3aed">ระยะ 3<br>ตั้งฐาน</b></td>
+            <td>เดือน 7+</td>
+            <td>Dealer เต็มรูป (โมเดล 1)</td>
+            <td>Margin 30–40% ของราคาปลีก</td>
+            <td><b>100,000 บาท</b></td>
+            <td style="font-size:12px">ถ้าระยะ 2 เฉลี่ย &gt;80,000/เดือน ได้ Territory Protection ทันที</td>
+          </tr>
+        </tbody>
+      </table></div>
+    </div>
+
+    <!-- Contract terms -->
+    <div class="card" style="margin-bottom:18px">
+      <div class="sec-hdr"><div class="sec-title">📝 เงื่อนไขสำคัญที่ต้องระบุในสัญญา</div></div>
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>เรื่อง</th><th>ที่แนะนำ</th><th>ทำไมต้องมี</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><b>อัตรา Commission</b></td>
+            <td style="font-size:12px">25% ของราคาปลีก (ระยะที่ 1) ตามผลงาน 6 เดือน</td>
+            <td style="font-size:12px;color:var(--gd)">20% ต่ำเกินไปสำหรับพาร์ทเนอร์ที่ใช้พื้นที่และเวลาตัวเอง</td>
+          </tr>
+          <tr>
+            <td><b>ราคาขั้นต่ำ (MAP)</b></td>
+            <td style="font-size:12px">ห้ามขายต่ำกว่า 85% ของราคาปลีก โดยไม่ขออนุมัติเป็นลายลักษณ์อักษร</td>
+            <td style="font-size:12px;color:var(--gd)">ป้องกัน Brand เสียหายถ้าเพื่อนตัดราคา</td>
+          </tr>
+          <tr>
+            <td><b>การป้องกันพื้นที่</b></td>
+            <td style="font-size:12px">เพื่อนมีสิทธิ์ Exclusive ใน [ระบุพื้นที่] 12 เดือน ถ้าถึงเป้า</td>
+            <td style="font-size:12px;color:var(--gd)">ป้องกันความขัดแย้งเมื่อเราเพิ่ม Dealer ใหม่ในอนาคต</td>
+          </tr>
+          <tr>
+            <td><b>Non-Compete</b></td>
+            <td style="font-size:12px">ห้ามขายสินค้าคู่แข่งในหมวด Sanitary เดียวกันในบูเดียวกัน</td>
+            <td style="font-size:12px;color:var(--gd)">ป้องกันเพื่อน redirect ลูกค้าไปให้คู่แข่ง</td>
+          </tr>
+          <tr>
+            <td><b>เวลาจ่าย Commission</b></td>
+            <td style="font-size:12px">จ่ายวันที่ 5 ของเดือนถัดไป หลังยืนยัน Delivery แล้ว</td>
+            <td style="font-size:12px;color:var(--gd)">เราต้องเก็บเงินจากลูกค้าได้ก่อนจ่าย commission</td>
+          </tr>
+          <tr>
+            <td><b>Lead Registration</b></td>
+            <td style="font-size:12px">เพื่อนส่ง Lead Form มาให้เรา confirm ก่อนทำงานทุกครั้ง</td>
+            <td style="font-size:12px;color:var(--gd)">ป้องกันทะเลาะเรื่อง "ใครเป็นคนหาลูกค้า"</td>
+          </tr>
+          <tr>
+            <td><b>ระยะสัญญา</b></td>
+            <td style="font-size:12px">12 เดือน ต่ออายุได้ แจ้งล่วงหน้า 30 วันถ้าจะยกเลิก</td>
+            <td style="font-size:12px;color:var(--gd)">ยึดหยุ่น ไม่ lock กันถ้าทำงานร่วมกันไม่ได้</td>
+          </tr>
+        </tbody>
+      </table></div>
+    </div>
+
+    <!-- Risk table -->
+    <div class="card" style="margin-bottom:18px">
+      <div class="sec-hdr"><div class="sec-title">⚠️ ความเสี่ยงที่ต้องระวัง</div></div>
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>ความเสี่ยง</th><th>โมเดล 1</th><th>โมเดล 2</th><th>วิธีป้องกัน</th></tr></thead>
+        <tbody>
+          <tr><td>เพื่อนตัดราคา ทำ Brand เสียหาย</td><td><span class="badge b-followup">สูง</span></td><td><span class="badge b-interested">ต่ำ</span></td><td style="font-size:12px">กำหนด MAP (ราคาขั้นต่ำ) ในสัญญา</td></tr>
+          <tr><td>เพื่อนขายของคู่แข่งกัน</td><td><span class="badge b-followup">สูง</span></td><td><span class="badge b-catalog">ปานกลาง</span></td><td style="font-size:12px">ใส่ Non-Compete clause ในสัญญา</td></tr>
+          <tr><td>สต็อกค้าง เพื่อนขอคืนของ</td><td><span class="badge b-followup">สูง</span></td><td><span class="badge b-interested">ไม่มี</span></td><td style="font-size:12px">ระบุ No Return policy ชัดๆ</td></tr>
+          <tr><td>ของแตกระหว่างส่ง (หลังรับของ)</td><td><span class="badge b-followup">สูง</span></td><td><span class="badge b-interested">ไม่มี</span></td><td style="font-size:12px">Training packaging + ซื้อประกันเพิ่ม</td></tr>
+          <tr><td>เราส่งช้า ซื้อเสียเพื่อนเสีย</td><td><span class="badge b-interested">ไม่มี</span></td><td><span class="badge b-followup">สูง</span></td><td style="font-size:12px">กำหนด SLA ส่งภายใน 3 วันทำการ</td></tr>
+          <tr><td>เพื่อนไม่ motivated ขายน้อย</td><td><span class="badge b-interested">ต่ำ</span></td><td><span class="badge b-followup">สูง</span></td><td style="font-size:12px">ขึ้น commission เป็น 25% + ตั้ง target</td></tr>
+        </tbody>
+      </table></div>
+    </div>
+
+    <!-- Summary box -->
+    <div class="card">
+      <div class="sec-hdr"><div class="sec-title">🎯 สรุปสุดท้าย — คำแนะนำ</div></div>
+      <div class="info-box gold" style="margin-bottom:12px">
+        <b>แนะนำ: เริ่มต้วย Commission 25% (ระยะทดสอบ 3 เดือน)</b><br><br>
+        Commission Model (โมเดล 2) ที่ปรับขึ้นเป็น 25% คือจุดเริ่มต้นที่ดีที่สุด เพราะ CERAFIELD ไม่เสี่ยงอะไร ควบคุม Brand ได้ และดูก่อนว่าเพื่อนมีลูกค้าจริงๆ หรือเปล่าก่อนที่จะ commit เรื่องราคา Project
+      </div>
+      <div class="info-box green" style="margin-bottom:12px">
+        20% ที่เสนอมาตอนแรกต่ำกว่ามาตรฐาน Showroom Partner ในอุตสาหกรรมนี้ (มาตรฐานอยู่ที่ 20–25%) — ปรับขึ้น 5% ช่วยให้เพื่อน motivated มากขึ้น โดยที่ต้นทุนเราเพิ่มน้อยมาก
+      </div>
+      <div class="info-box blue">
+        พอ 3–6 เดือนผ่านไปและขอดขายพิสูจน์ตัวเองได้แล้ว ค่อย Upgrade เป็นโมเดล Dealer (Model 1) พร้อม Territory Protection อย่างเป็นทางการ — นี่คือแนวทางที่ Kohler, COTTO และ American Standard ใช้กับ Showroom Partner ในไทย
+      </div>
+    </div>
+
+  </div><!-- /s-advice -->
+
+</div><!-- /panel-logi -->
+
+</div><!-- /main -->
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- ===== MODALS ===== -->
+
+<!-- Modal: Project -->
+<div class="overlay" id="mProj">
+  <div class="modal">
+    <div class="modal-hdr">
+      <div class="modal-title" id="mProjTitle">เพิ่มโครงการใหม่</div>
+      <button class="modal-close" onclick="closeM('mProj')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="fProjId">
+      <div class="fg"><label>ชื่อโครงการ *</label><input id="fProjName" placeholder="เช่น Siam Pan Pacific Hotel"></div>
+      <div class="fr">
+        <div class="fg"><label>ประเภท</label>
+          <select id="fProjType">
+            <option value="hotel">โรงแรม</option>
+            <option value="condo">คอนโดมิเนียม</option>
+            <option value="hospital">โรงพยาบาล</option>
+            <option value="office">อาคารสำนักงาน</option>
+            <option value="retail">ศูนย์การค้า/Retail</option>
+            <option value="residential">บ้าน/หมู่บ้าน</option>
+            <option value="government">ราชการ/รัฐวิสาหกิจ</option>
+            <option value="other">อื่นๆ</option>
+          </select>
+        </div>
+        <div class="fg"><label>ขั้นตอนปัจจุบัน</label>
+          <select id="fProjStage">
+            <option value="design">ออกแบบ</option>
+            <option value="construction" selected>ก่อสร้าง</option>
+            <option value="procurement">จัดซื้อ</option>
+            <option value="completed">เสร็จแล้ว</option>
+          </select>
+        </div>
+      </div>
+      <div class="fr">
+        <div class="fg"><label>สถานที่/จังหวัด</label><input id="fProjLoc" placeholder="เช่น กรุงเทพ, ชลบุรี"></div>
+        <div class="fg"><label>ปีที่คาดว่าจะเสร็จ</label>
+          <select id="fProjYear">
+            <option value="2026">2026 (2569)</option>
+            <option value="2027" selected>2027 (2570)</option>
+            <option value="2028">2028 (2571)</option>
+            <option value="2029">2029 (2572)</option>
+            <option value="2030">2030 (2573)</option>
+          </select>
+        </div>
+      </div>
+      <div class="fr">
+        <div class="fg"><label>มูลค่าโครงการ (ประมาณ)</label><input id="fProjVal" placeholder="เช่น 500 ล้านบาท"></div>
+        <div class="fg"><label>จำนวนห้องน้ำ (ประมาณ)</label><input id="fProjBath" placeholder="เช่น 300 ห้อง"></div>
+      </div>
+      <div class="fg"><label>แหล่งที่มา</label><input id="fProjSrc" placeholder="เช่น ICONS, แนะนำโดย..."></div>
+      <div class="fg"><label>หมายเหตุ / ข้อมูลเพิ่มเติม</label><textarea id="fProjNotes" placeholder="ข้อมูลที่ควรจำเกี่ยวกับโครงการนี้"></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeM('mProj')">ยกเลิก</button>
+      <button class="btn btn-primary" onclick="saveProj()">บันทึก</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Contact -->
+<div class="overlay" id="mCont">
+  <div class="modal">
+    <div class="modal-hdr">
+      <div class="modal-title" id="mContTitle">เพิ่มผู้ติดต่อ</div>
+      <button class="modal-close" onclick="closeM('mCont')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="fContId">
+      <div class="fg"><label>โครงการที่เกี่ยวข้อง *</label><select id="fContProj"><option value="">-- เลือกโครงการ --</option></select></div>
+      <div class="fr">
+        <div class="fg"><label>ชื่อ-นามสกุล *</label><input id="fContName" placeholder="เช่น คุณสมชาย ใจดี"></div>
+        <div class="fg"><label>ตำแหน่ง</label><input id="fContPos" placeholder="เช่น Project Manager"></div>
+      </div>
+      <div class="fr">
+        <div class="fg"><label>บริษัท</label><input id="fContCo" placeholder="ชื่อบริษัท / สำนักงาน"></div>
+        <div class="fg"><label>บทบาทในโครงการ</label>
+          <select id="fContRole">
+            <option value="owner">เจ้าของโครงการ</option>
+            <option value="architect" selected>สถาปนิก</option>
+            <option value="interior">ออกแบบภายใน (ID)</option>
+            <option value="contractor">ผู้รับเหมาหลัก (GC)</option>
+            <option value="mep">MEP / งานระบบ</option>
+            <option value="qs">QS / Cost Control</option>
+            <option value="pm">PM / Site Manager</option>
+            <option value="proc">ฝ่ายจัดซื้อ</option>
+            <option value="other">อื่นๆ</option>
+          </select>
+        </div>
+      </div>
+      <div class="fr">
+        <div class="fg"><label>เบอร์โทร</label><input id="fContPhone" placeholder="0xx-xxx-xxxx" type="tel"></div>
+        <div class="fg"><label>อีเมล</label><input id="fContEmail" placeholder="email@company.com" type="email"></div>
+      </div>
+      <div class="fr">
+        <div class="fg"><label>LINE ID</label><input id="fContLine" placeholder="LINE ID"></div>
+        <div class="fg" style="padding-top:22px">
+          <label class="toggle-lbl"><input type="checkbox" id="fContLineAdded"> แอด LINE แล้ว ✓</label>
+        </div>
+      </div>
+      <div class="fg"><label>สถานะการติดต่อ</label>
+        <select id="fContStatus">
+          <option value="new">🆕 ใหม่ — ยังไม่ได้ติดต่อ</option>
+          <option value="contacted">📞 ติดต่อแล้ว</option>
+          <option value="catalog_sent">📄 ส่ง Catalog แล้ว</option>
+          <option value="email_sent">📧 ส่งอีเมลแล้ว</option>
+          <option value="line_sent">💬 ส่งทาง LINE แล้ว</option>
+          <option value="followup">🔔 รอตามงาน</option>
+          <option value="interested">✅ สนใจสินค้า</option>
+          <option value="not_interested">❌ ไม่สนใจ / ล็อคสเปกแล้ว</option>
+        </select>
+      </div>
+      <div class="fg"><label>หมายเหตุ</label><textarea id="fContNotes" placeholder="ข้อมูลที่ควรจำ เช่น ดูแลแค่ส่วนกลาง, ให้ต่อคนอื่น, ต้องรอ spec confirm"></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeM('mCont')">ยกเลิก</button>
+      <button class="btn btn-primary" onclick="saveCont()">บันทึก</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Activity -->
+<div class="overlay" id="mAct">
+  <div class="modal">
+    <div class="modal-hdr">
+      <div class="modal-title">📝 บันทึกการติดต่อ</div>
+      <button class="modal-close" onclick="closeM('mAct')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="fActId">
+      <div class="fr">
+        <div class="fg"><label>ผู้ติดต่อ *</label><select id="fActCont"><option value="">-- เลือกผู้ติดต่อ --</option></select></div>
+        <div class="fg"><label>ประเภท</label>
+          <select id="fActType">
+            <option value="call">📞 โทรศัพท์</option>
+            <option value="email">📧 อีเมล</option>
+            <option value="line">💬 LINE</option>
+            <option value="meeting">🤝 ประชุม / พบตัว</option>
+            <option value="other">อื่นๆ</option>
+          </select>
+        </div>
+      </div>
+      <div class="fr">
+        <div class="fg"><label>วันที่</label><input type="date" id="fActDate"></div>
+        <div class="fg"><label>อัปเดตสถานะผู้ติดต่อ</label>
+          <select id="fActStatus">
+            <option value="">-- ไม่เปลี่ยน --</option>
+            <option value="contacted">📞 ติดต่อแล้ว</option>
+            <option value="catalog_sent">📄 ส่ง Catalog แล้ว</option>
+            <option value="email_sent">📧 ส่งอีเมลแล้ว</option>
+            <option value="line_sent">💬 ส่งทาง LINE แล้ว</option>
+            <option value="followup">🔔 รอตามงาน</option>
+            <option value="interested">✅ สนใจสินค้า</option>
+            <option value="not_interested">❌ ไม่สนใจ</option>
+          </select>
+        </div>
+      </div>
+      <div class="fg">
+        <label>สรุปการคุย / สิ่งที่เกิดขึ้น *</label>
+        <textarea id="fActNotes" style="min-height:90px" placeholder="เช่น โทรหาคุณสมชาย — รับสาย บอกว่าตัวเขาดูแลแค่ส่วนกลาง ห้องพักในคอนโดล็อคสเปกมาจากฝ่าย ID แล้ว ให้ติดต่อ Interior Design แทน"></textarea>
+      </div>
+      <div class="fr">
+        <div class="fg"><label>สิ่งที่ต้องทำต่อ (Next Action)</label><input id="fActNext" placeholder="เช่น โทรตาม ID ของโปรเจค, ส่งใบเสนอราคา"></div>
+        <div class="fg"><label>📅 วัน Follow up</label><input type="date" id="fActFU"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeM('mAct')">ยกเลิก</button>
+      <button class="btn btn-primary" onclick="saveAct()">บันทึก</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Contact Detail -->
+<div class="overlay" id="mContDetail">
+  <div class="modal modal-wide">
+    <div class="modal-hdr">
+      <div class="modal-title" id="mContDetailTitle">รายละเอียด</div>
+      <button class="modal-close" onclick="closeM('mContDetail')">✕</button>
+    </div>
+    <div class="modal-body" id="mContDetailBody"></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeM('mContDetail')">ปิด</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── DATA ──────────────────────────────────────────────────────
+const KEY = 'cera_crm_v2';
+function db(){const r=localStorage.getItem(KEY);return r?JSON.parse(r):{projects:[],contacts:[],activities:[]}}
+function save(d){localStorage.setItem(KEY,JSON.stringify(d))}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).substr(2,8)}
+
+// ── LOOKUP MAPS ───────────────────────────────────────────────
+const TYPE_LBL={hotel:'โรงแรม',condo:'คอนโด',hospital:'โรงพยาบาล',office:'สำนักงาน',retail:'ศูนย์การค้า',residential:'บ้าน',government:'ราชการ',other:'อื่นๆ'};
+const STAGE_LBL={design:'🎨 ออกแบบ',construction:'🏗️ ก่อสร้าง',procurement:'🛒 จัดซื้อ',completed:'✅ เสร็จแล้ว'};
+const STAGE_CLS={design:'s-design',construction:'s-construction',procurement:'s-procurement',completed:'s-completed'};
+const ROLE_LBL={owner:'เจ้าของโครงการ',architect:'สถาปนิก',interior:'ออกแบบภายใน',contractor:'ผู้รับเหมา (GC)',mep:'MEP',qs:'QS',pm:'PM',proc:'จัดซื้อ',other:'อื่นๆ'};
+const ROLE_CLS={owner:'r-owner',architect:'r-architect',interior:'r-interior',contractor:'r-contractor',mep:'r-mep',qs:'r-qs',pm:'r-pm',proc:'r-proc',other:'r-other'};
+const ACT_LBL={call:'📞 โทร',email:'📧 อีเมล',line:'💬 LINE',meeting:'🤝 พบ',other:'•'};
+const ACT_CLS={call:'a-call',email:'a-email',line:'a-line',meeting:'a-meeting',other:'b-new'};
+
+const STATUS={
+  new:{lbl:'🆕 ใหม่',cls:'b-new',col:'#6366f1'},
+  contacted:{lbl:'📞 ติดต่อแล้ว',cls:'b-contacted',col:'#3b82f6'},
+  catalog_sent:{lbl:'📄 ส่ง Catalog',cls:'b-catalog',col:'#f59e0b'},
+  email_sent:{lbl:'📧 ส่งอีเมล',cls:'b-email',col:'#8b5cf6'},
+  line_sent:{lbl:'💬 ส่ง LINE',cls:'b-line',col:'#10b981'},
+  followup:{lbl:'🔔 รอตาม',cls:'b-followup',col:'#ef4444'},
+  interested:{lbl:'✅ สนใจ',cls:'b-interested',col:'#10b981'},
+  not_interested:{lbl:'❌ ไม่สนใจ',cls:'b-lost',col:'#9ca3af'}
+};
+
+// ── NAVIGATION ────────────────────────────────────────────────
+function showTab(name){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  const idx={dash:0,proj:1,cont:2,act:3,rpt:4,logi:5};
+  document.getElementById('panel-'+name).classList.add('active');
+  document.querySelectorAll('.nav-tab')[idx[name]].classList.add('active');
+  if(name==='dash')renderDash();
+  if(name==='proj')renderProjs();
+  if(name==='cont')renderConts();
+  if(name==='act')renderActs();
+  if(name==='rpt')renderRpt();
+}
+
+function showStab(sid){
+  document.querySelectorAll('.spanel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.stab').forEach(t=>t.classList.remove('active'));
+  document.getElementById(sid).classList.add('active');
+  // find which stab button corresponds to sid
+  const map={'s-ship':0,'s-veh':1,'s-partner':2,'s-advice':3};
+  document.querySelectorAll('.stab')[map[sid]].classList.add('active');
+}
+
+// ── MODALS ────────────────────────────────────────────────────
+function openM(id){document.getElementById(id).classList.add('open')}
+function closeM(id){document.getElementById(id).classList.remove('open')}
+document.querySelectorAll('.overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('open')}));
+
+// ── TOAST ──────────────────────────────────────────────────────
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2400)}
+
+// ── HELPERS ───────────────────────────────────────────────────
+function fmtDate(s){
+  if(!s)return'';
+  try{const d=new Date(s+'T00:00:00');return d.toLocaleDateString('th-TH',{day:'numeric',month:'short',year:'2-digit'})}
+  catch{return s}
+}
+function today(){return new Date().toISOString().split('T')[0]}
+function isOver(s){return s&&s<today()}
+function daysText(s){
+  const t=today();
+  if(s===t)return'วันนี้!';
+  const diff=Math.round((new Date(s)-new Date(t))/(864e5));
+  return diff<0?`เลย ${Math.abs(diff)} วันแล้ว`:`อีก ${diff} วัน`;
+}
+function avatar(name,col){return`<div class="c-avatar" style="background:${col||'var(--navy)'}">${(name||'?')[0].toUpperCase()}</div>`}
+
+// ── PROJECTS ──────────────────────────────────────────────────
+function openProjModal(id){
+  const d=id?db().projects.find(p=>p.id===id):null;
+  document.getElementById('fProjId').value=d?d.id:'';
+  document.getElementById('fProjName').value=d?d.name:'';
+  document.getElementById('fProjType').value=d?d.type:'hotel';
+  document.getElementById('fProjStage').value=d?d.stage:'construction';
+  document.getElementById('fProjLoc').value=d?d.loc||'':'';
+  document.getElementById('fProjYear').value=d?d.year||'2027':'2027';
+  document.getElementById('fProjVal').value=d?d.val||'':'';
+  document.getElementById('fProjBath').value=d?d.bath||'':'';
+  document.getElementById('fProjSrc').value=d?d.src||'ICONS':'ICONS';
+  document.getElementById('fProjNotes').value=d?d.notes||'':'';
+  document.getElementById('mProjTitle').textContent=d?'แก้ไขโครงการ':'เพิ่มโครงการใหม่';
+  openM('mProj');
+}
+
+function saveProj(){
+  const name=document.getElementById('fProjName').value.trim();
+  if(!name){alert('กรุณากรอกชื่อโครงการ');return}
+  const x=db();const eid=document.getElementById('fProjId').value;
+  const data={name,type:document.getElementById('fProjType').value,stage:document.getElementById('fProjStage').value,loc:document.getElementById('fProjLoc').value.trim(),year:document.getElementById('fProjYear').value,val:document.getElementById('fProjVal').value.trim(),bath:document.getElementById('fProjBath').value.trim(),src:document.getElementById('fProjSrc').value.trim(),notes:document.getElementById('fProjNotes').value.trim(),upd:new Date().toISOString()};
+  if(eid){const i=x.projects.findIndex(p=>p.id===eid);if(i>=0)x.projects[i]={...x.projects[i],...data}}
+  else x.projects.push({id:uid(),cre:new Date().toISOString(),...data});
+  save(x);closeM('mProj');toast('✅ บันทึกโครงการแล้ว');renderProjs();
+}
+
+function delProj(id){
+  if(!confirm('ลบโครงการนี้? ข้อมูลผู้ติดต่อและกิจกรรมทั้งหมดในโครงการจะถูกลบด้วย'))return;
+  const x=db();
+  const cids=x.contacts.filter(c=>c.projId===id).map(c=>c.id);
+  x.projects=x.projects.filter(p=>p.id!==id);
+  x.contacts=x.contacts.filter(c=>c.projId!==id);
+  x.activities=x.activities.filter(a=>!cids.includes(a.cid));
+  save(x);toast('🗑️ ลบแล้ว');renderProjs();
+}
+
+function renderProjs(){
+  const x=db();const el=document.getElementById('projList');
+  if(!x.projects.length){el.innerHTML=`<div class="empty"><div class="empty-ico">🏗️</div><div>ยังไม่มีโครงการ<br>กด "+ เพิ่มโครงการ" เพื่อเริ่มต้น</div></div>`;return}
+  el.innerHTML=[...x.projects].sort((a,b)=>new Date(b.cre)-new Date(a.cre)).map(p=>{
+    const conts=x.contacts.filter(c=>c.projId===p.id);
+    const cids=conts.map(c=>c.id);
+    const acts=x.activities.filter(a=>cids.includes(a.cid));
+    const pend=x.activities.filter(a=>cids.includes(a.cid)&&a.fuDate&&!a.fuDone);
+    const intd=conts.filter(c=>c.status==='interested').length;
+    return`<div class="proj-card">
+      <div class="proj-card-hdr" onclick="showProjDetail('${p.id}')">
+        <div>
+          <div class="proj-name">${p.name}</div>
+          <div class="proj-meta">
+            <span>${TYPE_LBL[p.type]||p.type}</span>
+            ${p.loc?`<span>📍 ${p.loc}</span>`:''}
+            ${p.year?`<span>📅 เสร็จปี ${p.year}</span>`:''}
+            ${p.bath?`<span>🚽 ~${p.bath} ห้องน้ำ</span>`:''}
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px">
+          <span class="badge ${STAGE_CLS[p.stage]}">${STAGE_LBL[p.stage]}</span>
+          ${pend.length?`<span class="badge b-followup">🔔 ${pend.length} ต้องตาม</span>`:''}
+          ${intd?`<span class="badge b-interested">✅ ${intd} สนใจ</span>`:''}
+        </div>
+      </div>
+      <div class="proj-ftr">
+        <span style="font-size:12px;color:var(--gray)">👥 ${conts.length} คน</span>
+        <span style="font-size:12px;color:var(--gray)">📝 ${acts.length} กิจกรรม</span>
+        <div style="flex:1"></div>
+        <button class="btn btn-sm btn-ghost" onclick="event.stopPropagation();openProjModal('${p.id}')">แก้ไข</button>
+        <button class="btn btn-sm btn-primary" onclick="event.stopPropagation();openContModalForProj('${p.id}')">+ เพิ่มคน</button>
+        <button class="btn btn-sm btn-danger" onclick="event.stopPropagation();delProj('${p.id}')">ลบ</button>
+      </div>
+    </div>`}).join('');
+}
+
+function showProjList(){document.getElementById('proj-list-view').style.display='';document.getElementById('proj-detail-view').style.display='none'}
+function showProjDetail(pid){document.getElementById('proj-list-view').style.display='none';document.getElementById('proj-detail-view').style.display='';renderProjDetail(pid)}
+
+function renderProjDetail(pid){
+  const x=db();const p=x.projects.find(q=>q.id===pid);if(!p)return;
+  const conts=x.contacts.filter(c=>c.projId===pid);
+  const cids=conts.map(c=>c.id);
+  const acts=[...x.activities].filter(a=>cids.includes(a.cid)).sort((a,b)=>new Date(b.date)-new Date(a.date));
+  // group by company
+  const byco={};
+  conts.forEach(c=>{const k=c.co||'ไม่ระบุบริษัท';if(!byco[k])byco[k]=[];byco[k].push(c)});
+
+  document.getElementById('projDetail').innerHTML=`
+    <div class="detail-hdr">
+      <div style="font-size:11px;color:var(--gold);margin-bottom:6px">${TYPE_LBL[p.type]||p.type} · ${STAGE_LBL[p.stage]}</div>
+      <div class="detail-title">${p.name}</div>
+      <div class="detail-sub">${[p.loc?'📍 '+p.loc:'',p.year?'📅 เสร็จปี '+p.year:'',p.bath?'🚽 ~'+p.bath+' ห้องน้ำ':'',p.val?'💰 '+p.val:''].filter(Boolean).join(' · ')}</div>
+      ${p.notes?`<div style="font-size:12px;color:rgba(255,255,255,.55);margin-top:8px">${p.notes}</div>`:''}
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px" class="two-col">
+      <div>
+        <div class="sec-hdr">
+          <div class="sec-title">👥 ผู้ติดต่อในโครงการ</div>
+          <button class="btn btn-sm btn-primary" onclick="openContModalForProj('${pid}')">+ เพิ่มคน</button>
+        </div>
+        ${!conts.length?`<div class="card"><div class="empty"><div class="empty-ico">👤</div><div>ยังไม่มีผู้ติดต่อ</div></div></div>`:
+        Object.entries(byco).map(([co,cs])=>`
+          <div class="card" style="margin-bottom:12px">
+            <div style="font-size:12px;font-weight:800;color:var(--navy);margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--border)">🏢 ${co}</div>
+            ${cs.map(c=>{
+              const si=STATUS[c.status]||STATUS.new;
+              const la=x.activities.filter(a=>a.cid===c.id).sort((a,b)=>new Date(b.date)-new Date(a.date))[0];
+              const pf=x.activities.filter(a=>a.cid===c.id&&a.fuDate&&!a.fuDone);
+              return`<div class="cr" style="cursor:pointer" onclick="openContDetail('${c.id}')">
+                ${avatar(c.name,si.col)}
+                <div style="flex:1">
+                  <div style="font-weight:700;font-size:13px">${c.name}</div>
+                  <div style="font-size:11px;color:var(--gray)">${c.pos||''}</div>
+                  <div style="margin-top:4px;display:flex;gap:4px;flex-wrap:wrap">
+                    <span class="badge ${ROLE_CLS[c.role]||'r-other'}">${ROLE_LBL[c.role]||c.role}</span>
+                    <span class="badge ${si.cls}">${si.lbl}</span>
+                    ${c.lineAdded?'<span class="badge b-line">LINE ✓</span>':''}
+                    ${pf.length?`<span class="badge b-followup">🔔</span>`:''}
+                  </div>
+                  ${la?`<div style="font-size:11px;color:var(--gray);margin-top:3px">ล่าสุด: ${fmtDate(la.date)}</div>`:''}
+                </div>
+                <button class="btn btn-sm btn-gold" onclick="event.stopPropagation();openActForCont('${c.id}')">+ บันทึก</button>
+              </div>`}).join('')}
+          </div>`).join('')}
+      </div>
+      <div>
+        <div class="sec-hdr"><div class="sec-title">📋 Timeline กิจกรรม</div></div>
+        <div class="card">
+          ${!acts.length?`<div class="empty"><div class="empty-ico">📋</div><div>ยังไม่มีกิจกรรม</div></div>`:
+          acts.map(a=>{
+            const c=x.contacts.find(q=>q.id===a.cid);
+            return`<div class="act-item">
+              <div class="act-dot" style="margin-top:7px"></div>
+              <div style="flex:1">
+                <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:4px">
+                  <div>
+                    <span class="badge ${ACT_CLS[a.type]||''}">${ACT_LBL[a.type]||a.type}</span>
+                    <span style="font-size:12px;color:var(--gray);margin-left:6px">${c?c.name:''}</span>
+                  </div>
+                  <span style="font-size:11px;color:var(--gray);white-space:nowrap">${fmtDate(a.date)}</span>
+                </div>
+                ${a.notes?`<div style="font-size:12px;color:var(--text)">${a.notes}</div>`:''}
+                ${a.next?`<div style="font-size:12px;color:var(--navy);font-weight:600;margin-top:3px">→ ${a.next}</div>`:''}
+                ${a.fuDate?`<div style="margin-top:6px;display:flex;align-items:center;gap:7px">
+                  <div class="chk ${a.fuDone?'done':''}" onclick="toggleFU('${a.id}','${pid}')">
+                    ${a.fuDone?'✓':''}
+                  </div>
+                  <span style="font-size:11px;color:${a.fuDone?'var(--green)':isOver(a.fuDate)?'var(--red)':'var(--gd)'}">
+                    ${a.fuDone?'ตามแล้ว ✓':'ตาม: '+fmtDate(a.fuDate)}
+                  </span>
+                </div>`:''}
+              </div>
+            </div>`}).join('')}
+        </div>
+      </div>
+    </div>`;
+}
+
+// ── CONTACTS ──────────────────────────────────────────────────
+function populateProjSel(selId,val){
+  const el=document.getElementById(selId);
+  el.innerHTML='<option value="">-- เลือกโครงการ --</option>'+db().projects.map(p=>`<option value="${p.id}">${p.name}</option>`).join('');
+  if(val)el.value=val;
+}
+
+function openContModal(id){
+  const d=id?db().contacts.find(c=>c.id===id):null;
+  populateProjSel('fContProj',d?d.projId:'');
+  document.getElementById('fContId').value=d?d.id:'';
+  document.getElementById('fContName').value=d?d.name:'';
+  document.getElementById('fContPos').value=d?d.pos||'':'';
+  document.getElementById('fContCo').value=d?d.co||'':'';
+  document.getElementById('fContRole').value=d?d.role||'architect':'architect';
+  document.getElementById('fContPhone').value=d?d.phone||'':'';
+  document.getElementById('fContEmail').value=d?d.email||'':'';
+  document.getElementById('fContLine').value=d?d.lineId||'':'';
+  document.getElementById('fContLineAdded').checked=d?d.lineAdded||false:false;
+  document.getElementById('fContStatus').value=d?d.status||'new':'new';
+  document.getElementById('fContNotes').value=d?d.notes||'':'';
+  document.getElementById('mContTitle').textContent=d?'แก้ไขผู้ติดต่อ':'เพิ่มผู้ติดต่อ';
+  openM('mCont');
+}
+
+function openContModalForProj(pid){openContModal();document.getElementById('fContProj').value=pid}
+
+function saveCont(){
+  const name=document.getElementById('fContName').value.trim();
+  const pid=document.getElementById('fContProj').value;
+  if(!name){alert('กรุณากรอกชื่อ');return}
+  if(!pid){alert('กรุณาเลือกโครงการ');return}
+  const x=db();const eid=document.getElementById('fContId').value;
+  const data={projId:pid,name,pos:document.getElementById('fContPos').value.trim(),co:document.getElementById('fContCo').value.trim(),role:document.getElementById('fContRole').value,phone:document.getElementById('fContPhone').value.trim(),email:document.getElementById('fContEmail').value.trim(),lineId:document.getElementById('fContLine').value.trim(),lineAdded:document.getElementById('fContLineAdded').checked,status:document.getElementById('fContStatus').value,notes:document.getElementById('fContNotes').value.trim(),upd:new Date().toISOString()};
+  if(eid){const i=x.contacts.findIndex(c=>c.id===eid);if(i>=0)x.contacts[i]={...x.contacts[i],...data}}
+  else x.contacts.push({id:uid(),cre:new Date().toISOString(),...data});
+  save(x);closeM('mCont');toast('✅ บันทึกผู้ติดต่อแล้ว');
+  // refresh relevant views
+  const ap=document.querySelector('.panel.active');
+  if(ap?.id==='panel-cont')renderConts();
+  if(ap?.id==='panel-proj'&&document.getElementById('proj-detail-view').style.display!=='none')renderProjDetail(pid);
+}
+
+function delCont(id){
+  if(!confirm('ลบผู้ติดต่อนี้?'))return;
+  const x=db();
+  x.contacts=x.contacts.filter(c=>c.id!==id);
+  x.activities=x.activities.filter(a=>a.cid!==id);
+  save(x);closeM('mContDetail');toast('🗑️ ลบแล้ว');renderConts();
+}
+
+function renderConts(){
+  const x=db();const q=(document.getElementById('contSearch')?.value||'').toLowerCase();
+  const el=document.getElementById('contTable');
+  let cs=x.contacts;
+  if(q)cs=cs.filter(c=>{const p=x.projects.find(pp=>pp.id===c.projId);return[c.name,c.co,c.pos,c.email,p?.name].some(v=>v&&v.toLowerCase().includes(q))});
+  if(!cs.length){el.innerHTML=`<div class="empty"><div class="empty-ico">👥</div><div>ไม่พบผู้ติดต่อ</div></div>`;return}
+  el.innerHTML=`<div class="tbl-wrap"><table><thead><tr><th>ชื่อ / ตำแหน่ง</th><th>บริษัท / บทบาท</th><th>โครงการ</th><th>ติดต่อ</th><th>สถานะ</th><th>ล่าสุด</th><th></th></tr></thead><tbody>${cs.map(c=>{
+    const p=x.projects.find(pp=>pp.id===c.projId);
+    const la=x.activities.filter(a=>a.cid===c.id).sort((a,b)=>new Date(b.date)-new Date(a.date))[0];
+    const si=STATUS[c.status]||STATUS.new;
+    return`<tr style="cursor:pointer" onclick="openContDetail('${c.id}')">
+      <td><div style="display:flex;align-items:center;gap:8px">${avatar(c.name,si.col)}<div><div style="font-weight:700">${c.name}</div><div style="font-size:11px;color:var(--gray)">${c.pos||''}</div></div></div></td>
+      <td><div style="font-size:13px">${c.co||'—'}</div><span class="badge ${ROLE_CLS[c.role]||'r-other'}">${ROLE_LBL[c.role]||c.role}</span></td>
+      <td style="font-size:13px">${p?p.name:'—'}</td>
+      <td style="font-size:12px">${[c.phone?'📞 '+c.phone:'',c.email?'📧 '+c.email:'',c.lineAdded?'💬 LINE ✓':''].filter(Boolean).join('<br>')}</td>
+      <td><span class="badge ${si.cls}">${si.lbl}</span></td>
+      <td style="font-size:12px;color:var(--gray)">${la?fmtDate(la.date):'—'}</td>
+      <td><button class="btn btn-sm btn-gold" onclick="event.stopPropagation();openActForCont('${c.id}')">+ บันทึก</button></td>
+    </tr>`}).join('')}</tbody></table></div>`;
+}
+
+function openContDetail(cid){
+  const x=db();const c=x.contacts.find(q=>q.id===cid);if(!c)return;
+  const p=x.projects.find(q=>q.id===c.projId);
+  const acts=x.activities.filter(a=>a.cid===cid).sort((a,b)=>new Date(b.date)-new Date(a.date));
+  const si=STATUS[c.status]||STATUS.new;
+  document.getElementById('mContDetailTitle').textContent=c.name;
+  document.getElementById('mContDetailBody').innerHTML=`
+    <div style="display:flex;gap:14px;margin-bottom:18px;align-items:start">
+      ${avatar(c.name,si.col).replace('class="c-avatar"','class="c-avatar" style="width:52px;height:52px;font-size:19px;background:'+si.col+'"')}
+      <div style="flex:1">
+        <div style="font-size:18px;font-weight:800">${c.name}</div>
+        <div style="font-size:13px;color:var(--gray)">${[c.pos,c.co].filter(Boolean).join(' · ')}</div>
+        <div style="margin-top:7px;display:flex;gap:5px;flex-wrap:wrap">
+          <span class="badge ${si.cls}">${si.lbl}</span>
+          <span class="badge ${ROLE_CLS[c.role]||'r-other'}">${ROLE_LBL[c.role]||c.role}</span>
+          ${c.lineAdded?'<span class="badge b-line">LINE ✓</span>':''}
+        </div>
+      </div>
+      <div style="display:flex;gap:6px">
+        <button class="btn btn-sm btn-ghost" onclick="closeM('mContDetail');openContModal('${c.id}')">✏️ แก้ไข</button>
+        <button class="btn btn-sm btn-danger" onclick="delCont('${c.id}')">🗑️</button>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:13px;margin-bottom:14px">
+      ${c.phone?`<div>📞 <a href="tel:${c.phone}" style="color:var(--navy)">${c.phone}</a></div>`:''}
+      ${c.email?`<div>📧 <a href="mailto:${c.email}" style="color:var(--navy)">${c.email}</a></div>`:''}
+      ${c.lineId?`<div>💬 LINE: ${c.lineId}</div>`:''}
+      ${p?`<div>🏗️ ${p.name}</div>`:''}
+    </div>
+    ${c.notes?`<div style="background:var(--cream);padding:11px;border-radius:8px;font-size:13px;margin-bottom:14px;color:var(--gd)">${c.notes}</div>`:''}
+    <div class="div"></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <div style="font-weight:700;font-size:14px">📋 ประวัติการติดต่อ (${acts.length})</div>
+      <button class="btn btn-sm btn-primary" onclick="closeM('mContDetail');openActForCont('${c.id}')">+ บันทึกใหม่</button>
+    </div>
+    ${!acts.length?'<div style="text-align:center;padding:20px;color:var(--gray)">ยังไม่มีการบันทึก</div>':
+    acts.map(a=>`<div class="act-item">
+      <div class="act-dot"></div>
+      <div style="flex:1">
+        <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:4px">
+          <span class="badge ${ACT_CLS[a.type]||''}">${ACT_LBL[a.type]||a.type}</span>
+          <span style="font-size:11px;color:var(--gray)">${fmtDate(a.date)}</span>
+        </div>
+        ${a.notes?`<div style="font-size:13px">${a.notes}</div>`:''}
+        ${a.next?`<div style="font-size:12px;color:var(--navy);font-weight:600;margin-top:3px">→ ${a.next}</div>`:''}
+        ${a.fuDate?`<div style="margin-top:5px;display:flex;align-items:center;gap:7px">
+          <div class="chk ${a.fuDone?'done':''}" onclick="toggleFU('${a.id}',null);setTimeout(()=>openContDetail('${c.id}'),80)">
+            ${a.fuDone?'✓':''}
+          </div>
+          <span style="font-size:11px;color:${a.fuDone?'var(--green)':isOver(a.fuDate)?'var(--red)':'var(--gd)'}">
+            ${a.fuDone?'ตามแล้ว ✓':'ตาม: '+fmtDate(a.fuDate)+' ('+daysText(a.fuDate)+')'}
+          </span>
+        </div>`:''}
+      </div>
+    </div>`).join('')}`;
+  openM('mContDetail');
+}
+
+// ── ACTIVITIES ────────────────────────────────────────────────
+function populateContSel(selId,val){
+  const x=db();
+  const el=document.getElementById(selId);
+  el.innerHTML='<option value="">-- เลือกผู้ติดต่อ --</option>'+x.contacts.map(c=>{
+    const p=x.projects.find(pp=>pp.id===c.projId);
+    return`<option value="${c.id}">${c.name}${c.co?' ('+c.co+')':''} — ${p?p.name:''}`;
+  }).join('');
+  if(val)el.value=val;
+}
+
+function openActModal(cid){
+  populateContSel('fActCont',cid||'');
+  document.getElementById('fActId').value='';
+  document.getElementById('fActType').value='call';
+  document.getElementById('fActDate').value=today();
+  document.getElementById('fActNotes').value='';
+  document.getElementById('fActNext').value='';
+  document.getElementById('fActFU').value='';
+  document.getElementById('fActStatus').value='';
+  openM('mAct');
+}
+
+function openActForCont(cid){openActModal(cid)}
+
+function saveAct(){
+  const cid=document.getElementById('fActCont').value;
+  if(!cid){alert('กรุณาเลือกผู้ติดต่อ');return}
+  const notes=document.getElementById('fActNotes').value.trim();
+  if(!notes){alert('กรุณากรอกสรุปการคุย');return}
+  const x=db();const c=x.contacts.find(q=>q.id===cid);
+  const data={cid,type:document.getElementById('fActType').value,date:document.getElementById('fActDate').value,notes,next:document.getElementById('fActNext').value.trim(),fuDate:document.getElementById('fActFU').value||null,fuDone:false,cre:new Date().toISOString()};
+  x.activities.push({id:uid(),...data});
+  const ns=document.getElementById('fActStatus').value;
+  if(ns&&c){const i=x.contacts.findIndex(q=>q.id===cid);if(i>=0)x.contacts[i].status=ns}
+  save(x);closeM('mAct');toast('✅ บันทึกกิจกรรมแล้ว');
+  const ap=document.querySelector('.panel.active');
+  if(ap?.id==='panel-act')renderActs();
+  if(ap?.id==='panel-cont')renderConts();
+  if(ap?.id==='panel-proj'&&document.getElementById('proj-detail-view').style.display!=='none'&&c)renderProjDetail(c.projId);
+  renderDash();
+}
+
+function renderActs(){
+  const x=db();const el=document.getElementById('actTable');
+  const acts=[...x.activities].sort((a,b)=>new Date(b.date)-new Date(a.date));
+  if(!acts.length){el.innerHTML=`<div class="empty"><div class="empty-ico">📋</div><div>ยังไม่มีกิจกรรม</div></div>`;return}
+  el.innerHTML=`<div class="tbl-wrap"><table><thead><tr><th>วันที่</th><th>ประเภท</th><th>ผู้ติดต่อ</th><th>โครงการ</th><th>สรุป</th><th>Next Action</th><th>Follow up</th></tr></thead><tbody>${acts.map(a=>{
+    const c=x.contacts.find(q=>q.id===a.cid);
+    const p=c?x.projects.find(q=>q.id===c.projId):null;
+    return`<tr>
+      <td style="font-size:12px;white-space:nowrap">${fmtDate(a.date)}</td>
+      <td><span class="badge ${ACT_CLS[a.type]||''}">${ACT_LBL[a.type]||a.type}</span></td>
+      <td style="font-size:13px">${c?`<div style="font-weight:600">${c.name}</div><div style="font-size:11px;color:var(--gray)">${c.co||''}</div>`:'—'}</td>
+      <td style="font-size:12px;color:var(--gray)">${p?p.name:'—'}</td>
+      <td style="font-size:12px;max-width:220px;white-space:pre-wrap">${a.notes||'—'}</td>
+      <td style="font-size:12px">${a.next||'—'}</td>
+      <td>${a.fuDate?`<div style="display:flex;align-items:center;gap:6px">
+        <div class="chk ${a.fuDone?'done':''}" onclick="toggleFU('${a.id}',null);renderActs()">
+          ${a.fuDone?'✓':''}
+        </div>
+        <span style="font-size:11px;color:${a.fuDone?'var(--green)':isOver(a.fuDate)?'var(--red)':'inherit'}">
+          ${fmtDate(a.fuDate)}<br>${a.fuDone?'✓':'('+daysText(a.fuDate)+')'}
+        </span>
+      </div>`:'—'}</td>
+    </tr>`}).join('')}</tbody></table></div>`;
+}
+
+function toggleFU(aid,pid){
+  const x=db();const a=x.activities.find(q=>q.id===aid);
+  if(a){a.fuDone=!a.fuDone;save(x);toast(a.fuDone?'✅ ตามแล้ว!':'↩️ ยกเลิก')}
+  if(pid)renderProjDetail(pid);
+  renderDash();
+}
+
+// ── DASHBOARD ──────────────────────────────────────────────────
+function renderDash(){
+  const x=db();const t=today();
+  const pend=x.activities.filter(a=>a.fuDate&&!a.fuDone);
+  const over=pend.filter(a=>a.fuDate<t);
+  const tod=pend.filter(a=>a.fuDate===t);
+  const up=pend.filter(a=>a.fuDate>t);
+  document.getElementById('statsGrid').innerHTML=`
+    <div class="stat-card"><div class="stat-num">${x.projects.length}</div><div class="stat-lbl">โครงการ</div></div>
+    <div class="stat-card"><div class="stat-num">${x.contacts.length}</div><div class="stat-lbl">ผู้ติดต่อ</div></div>
+    <div class="stat-card ${over.length?'red':''}"><div class="stat-num">${over.length}</div><div class="stat-lbl">เลย Follow up</div></div>
+    <div class="stat-card ${tod.length?'yellow':''}"><div class="stat-num">${tod.length}</div><div class="stat-lbl">ต้องตามวันนี้</div></div>`;
+
+  const allfu=[...over.map(a=>({...a,urg:'overdue'})),...tod.map(a=>({...a,urg:'today'})),...up.slice(0,6).map(a=>({...a,urg:'upcoming'}))];
+  const fu=document.getElementById('fuList');
+  if(!allfu.length){fu.innerHTML=`<div class="empty"><div class="empty-ico">🎉</div><div>ไม่มีรายการค้างครับ<br>เยี่ยมมาก!</div></div>`}
+  else{fu.innerHTML=allfu.map(a=>{
+    const c=x.contacts.find(q=>q.id===a.cid);
+    const p=c?x.projects.find(q=>q.id===c.projId):null;
+    const dcls=a.urg==='overdue'?'fu-date-red':a.urg==='today'?'fu-date-yellow':'fu-date-green';
+    const bcol=a.urg==='overdue'?'#fee2e2;color:#991b1b':a.urg==='today'?'#fef3c7;color:#92400e':'#d1fae5;color:#065f46';
+    return`<div class="fu-item ${a.urg}" onclick="${c?`openContDetail('${c.id}')`:''}">
+      <div class="fu-avatar">${(c?.name||'?')[0].toUpperCase()}</div>
+      <div style="flex:1">
+        <div class="fu-name">${c?.name||'?'}</div>
+        <div class="fu-proj">${[c?.co,p?.name].filter(Boolean).join(' · ')}</div>
+        ${a.next?`<div class="fu-action">→ ${a.next}</div>`:''}
+      </div>
+      <div style="text-align:right;flex-shrink:0">
+        <div class="${dcls}">${daysText(a.fuDate)}</div>
+        <button class="btn btn-sm" style="margin-top:5px;background:${bcol}" onclick="event.stopPropagation();toggleFU('${a.id}',null)">ตามแล้ว ✓</button>
+      </div>
+    </div>`}).join('')}
+
+  const ra=document.getElementById('recentActs');
+  const recent=[...x.activities].sort((a,b)=>new Date(b.cre)-new Date(a.cre)).slice(0,8);
+  if(!recent.length){ra.innerHTML=`<div class="empty"><div class="empty-ico">📋</div><div>ยังไม่มีกิจกรรม</div></div>`}
+  else{ra.innerHTML=recent.map(a=>{
+    const c=x.contacts.find(q=>q.id===a.cid);
+    const p=c?x.projects.find(q=>q.id===c.projId):null;
+    const ico={call:'📞',email:'📧',line:'💬',meeting:'🤝',other:'•'};
+    return`<div class="act-item">
+      <div class="act-dot"></div>
+      <div style="flex:1">
+        <div style="font-size:13px;font-weight:600">${ico[a.type]||'•'} ${c?.name||'—'}</div>
+        <div style="font-size:11px;color:var(--gray)">${p?.name||''} · ${fmtDate(a.date)}</div>
+        ${a.notes?`<div style="font-size:12px;color:var(--gd);margin-top:2px">${a.notes.length>90?a.notes.substr(0,90)+'…':a.notes}</div>`:''}
+      </div>
+    </div>`}).join('')}
+}
+
+// ── REPORT ─────────────────────────────────────────────────────
+function renderRpt(){
+  const x=db();
+  document.getElementById('rptDate').textContent='ข้อมูล ณ วันที่ '+fmtDate(today());
+  const intd=x.contacts.filter(c=>c.status==='interested').length;
+  const cont=x.contacts.filter(c=>c.status!=='new').length;
+  const pend=x.activities.filter(a=>a.fuDate&&!a.fuDone).length;
+  document.getElementById('rptContent').innerHTML=`
+    <div class="stats-grid" style="margin-bottom:20px">
+      <div class="stat-card"><div class="stat-num">${x.projects.length}</div><div class="stat-lbl">โครงการที่ติดตาม</div></div>
+      <div class="stat-card"><div class="stat-num">${x.contacts.length}</div><div class="stat-lbl">ผู้ติดต่อทั้งหมด</div></div>
+      <div class="stat-card"><div class="stat-num">${x.activities.length}</div><div class="stat-lbl">กิจกรรมทั้งหมด</div></div>
+      <div class="stat-card green"><div class="stat-num">${intd}</div><div class="stat-lbl">สนใจสินค้า</div></div>
+    </div>
+    <div class="card" style="margin-bottom:16px">
+      <div class="sec-title" style="margin-bottom:14px">📊 รายละเอียดแต่ละโครงการ</div>
+      <div class="tbl-wrap"><table><thead><tr><th>#</th><th>โครงการ</th><th>ประเภท</th><th>ขั้นตอน</th><th>เสร็จปี</th><th>ผู้ติดต่อ</th><th>กิจกรรม</th><th>ต้องตาม</th><th>ภาพรวม</th></tr></thead><tbody>
+      ${x.projects.map((p,i)=>{
+        const cs=x.contacts.filter(c=>c.projId===p.id);
+        const cids=cs.map(c=>c.id);
+        const as=x.activities.filter(a=>cids.includes(a.cid));
+        const pf=x.activities.filter(a=>cids.includes(a.cid)&&a.fuDate&&!a.fuDone);
+        const hasInt=cs.some(c=>c.status==='interested');
+        const hasSent=cs.some(c=>['catalog_sent','email_sent','line_sent'].includes(c.status));
+        const hasCont=cs.some(c=>c.status==='contacted');
+        let ovr='🔎 กำลังหา';
+        if(hasInt)ovr='✅ มีที่สนใจ';
+        else if(hasSent)ovr='📤 ส่งข้อมูลแล้ว';
+        else if(hasCont)ovr='📞 ติดต่อแล้ว';
+        return`<tr>
+          <td style="color:var(--gray)">${i+1}</td>
+          <td style="font-weight:700;cursor:pointer;color:var(--navy)" onclick="showTab('proj');setTimeout(()=>showProjDetail('${p.id}'),100)">${p.name}</td>
+          <td style="font-size:12px">${TYPE_LBL[p.type]||p.type}</td>
+          <td><span class="badge ${STAGE_CLS[p.stage]}">${STAGE_LBL[p.stage]}</span></td>
+          <td style="font-size:12px">${p.year||'—'}</td>
+          <td style="text-align:center">${cs.length}</td>
+          <td style="text-align:center">${as.length}</td>
+          <td style="text-align:center">${pf.length?`<span style="color:var(--red);font-weight:700">${pf.length}</span>`:'—'}</td>
+          <td style="font-size:12px">${ovr}</td>
+        </tr>`}).join('')}
+      </tbody></table></div>
+    </div>
+    <div style="color:var(--gray);font-size:12px;text-align:center;margin-top:10px">
+      CERAFIELD INTERNATIONAL (THAILAND) CO., LTD. · Nantapat Pukchanka, Account Executive · ${fmtDate(today())}
+    </div>`;
+}
+
+// ── SEARCH ─────────────────────────────────────────────────────
+function doGSearch(){
+  const q=document.getElementById('gSearch').value;
+  if(!q)return;
+  showTab('cont');
+  document.getElementById('contSearch').value=q;
+  renderConts();
+}
+
+// ── IMPORT / EXPORT ───────────────────────────────────────────
+function exportData(){
+  const blob=new Blob([JSON.stringify(db(),null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);const a=document.createElement('a');
+  a.href=url;a.download=`cerafield_crm_${today()}.json`;a.click();
+  URL.revokeObjectURL(url);toast('💾 Export สำเร็จ');
+}
+
+function importData(e){
+  const f=e.target.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=ev=>{try{
+    const d=JSON.parse(ev.target.result);
+    if(!d.projects||!d.contacts||!d.activities)throw 0;
+    if(!confirm(`Import จะแทนที่ข้อมูลเดิมทั้งหมด (${d.projects.length} โครงการ, ${d.contacts.length} คน)\nยืนยัน?`))return;
+    save(d);toast('📂 Import สำเร็จ');renderDash();
+  }catch{alert('ไฟล์ไม่ถูกต้อง')}};
+  r.readAsText(f);e.target.value='';
+}
+
+// ── INIT ───────────────────────────────────────────────────────
+document.getElementById('hdrDate').textContent=new Date().toLocaleDateString('th-TH',{weekday:'short',day:'numeric',month:'long',year:'numeric'});
+renderDash();
+</script>
+</body>
+</html>
