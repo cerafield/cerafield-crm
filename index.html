@@ -285,6 +285,26 @@ textarea{resize:vertical;min-height:75px}
       <div class="sec-title">🏗️ โครงการทั้งหมด</div>
       <button class="btn btn-primary" onclick="openProjModal()">+ เพิ่มโครงการ</button>
     </div>
+    <!-- SEARCH + FILTER BAR -->
+    <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap">
+      <div style="flex:1;min-width:220px;position:relative">
+        <span style="position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--gray);font-size:14px">🔍</span>
+        <input id="projSearch" placeholder="ค้นหา จังหวัด / ชื่อโครงการ / ประเภท..." style="padding-left:34px;width:100%" oninput="renderProjs()">
+      </div>
+      <select id="projOwnerFilter" onchange="renderProjs()" style="width:160px">
+        <option value="">👤 ทุกคน</option>
+        <option value="tony">🔵 Tony</option>
+        <option value="nong">🟢 K.</option>
+        <option value="both">🟡 ทั้งคู่</option>
+      </select>
+      <select id="projStageFilter" onchange="renderProjs()" style="width:150px">
+        <option value="">📋 ทุกขั้นตอน</option>
+        <option value="design">🎨 ออกแบบ</option>
+        <option value="construction">🏗️ ก่อสร้าง</option>
+        <option value="procurement">🛒 จัดซื้อ</option>
+      </select>
+    </div>
+    <div id="projCount" style="font-size:12px;color:var(--gray);margin-bottom:10px"></div>
     <div id="projList"></div>
   </div>
   <div id="proj-detail-view" style="display:none">
@@ -938,7 +958,16 @@ textarea{resize:vertical;min-height:75px}
         <div class="fg"><label>มูลค่าโครงการ (ประมาณ)</label><input id="fProjVal" placeholder="เช่น 500 ล้านบาท"></div>
         <div class="fg"><label>จำนวนห้องน้ำ (ประมาณ)</label><input id="fProjBath" placeholder="เช่น 300 ห้อง"></div>
       </div>
-      <div class="fg"><label>แหล่งที่มา</label><input id="fProjSrc" placeholder="เช่น ICONS, แนะนำโดย..."></div>
+      <div class="fr">
+        <div class="fg"><label>แหล่งที่มา</label><input id="fProjSrc" placeholder="เช่น ICONS, แนะนำโดย..."></div>
+        <div class="fg"><label>ผู้รับผิดชอบ</label>
+          <select id="fProjOwner">
+            <option value="tony">🔵 Tony (ผม)</option>
+            <option value="nong">🟢 K.</option>
+            <option value="both">🟡 ทั้งคู่</option>
+          </select>
+        </div>
+      </div>
       <div class="fg"><label>หมายเหตุ / ข้อมูลเพิ่มเติม</label><textarea id="fProjNotes" placeholder="ข้อมูลที่ควรจำเกี่ยวกับโครงการนี้"></textarea></div>
     </div>
     <div class="modal-footer">
@@ -1172,6 +1201,7 @@ function openProjModal(id){
   document.getElementById('fProjVal').value=d?d.val||'':'';
   document.getElementById('fProjBath').value=d?d.bath||'':'';
   document.getElementById('fProjSrc').value=d?d.src||'ICONS':'ICONS';
+  document.getElementById('fProjOwner').value=d?d.owner||'tony':'tony';
   document.getElementById('fProjNotes').value=d?d.notes||'':'';
   document.getElementById('mProjTitle').textContent=d?'แก้ไขโครงการ':'เพิ่มโครงการใหม่';
   openM('mProj');
@@ -1181,7 +1211,7 @@ function saveProj(){
   const name=document.getElementById('fProjName').value.trim();
   if(!name){alert('กรุณากรอกชื่อโครงการ');return}
   const x=db();const eid=document.getElementById('fProjId').value;
-  const data={name,type:document.getElementById('fProjType').value,stage:document.getElementById('fProjStage').value,loc:document.getElementById('fProjLoc').value.trim(),year:document.getElementById('fProjYear').value,val:document.getElementById('fProjVal').value.trim(),bath:document.getElementById('fProjBath').value.trim(),src:document.getElementById('fProjSrc').value.trim(),notes:document.getElementById('fProjNotes').value.trim(),upd:new Date().toISOString()};
+  const data={name,type:document.getElementById('fProjType').value,stage:document.getElementById('fProjStage').value,loc:document.getElementById('fProjLoc').value.trim(),year:document.getElementById('fProjYear').value,val:document.getElementById('fProjVal').value.trim(),bath:document.getElementById('fProjBath').value.trim(),src:document.getElementById('fProjSrc').value.trim(),owner:document.getElementById('fProjOwner').value,notes:document.getElementById('fProjNotes').value.trim(),upd:new Date().toISOString()};
   if(eid){const i=x.projects.findIndex(p=>p.id===eid);if(i>=0)x.projects[i]={...x.projects[i],...data}}
   else x.projects.push({id:uid(),cre:new Date().toISOString(),...data});
   save(x);closeM('mProj');toast('✅ บันทึกโครงการแล้ว');renderProjs();
@@ -1199,25 +1229,64 @@ function delProj(id){
 
 function renderProjs(){
   const x=db();const el=document.getElementById('projList');
-  if(!x.projects.length){el.innerHTML=`<div class="empty"><div class="empty-ico">🏗️</div><div>ยังไม่มีโครงการ<br>กด "+ เพิ่มโครงการ" เพื่อเริ่มต้น</div></div>`;return}
-  el.innerHTML=[...x.projects].sort((a,b)=>new Date(b.cre)-new Date(a.cre)).map(p=>{
+  const q=(document.getElementById('projSearch')?.value||'').toLowerCase().trim();
+  const ownerF=document.getElementById('projOwnerFilter')?.value||'';
+  const stageF=document.getElementById('projStageFilter')?.value||'';
+
+  const OWNER_LBL={tony:'🔵 Tony',nong:'🟢 K.',both:'🟡 ทั้งคู่'};
+  const OWNER_COL={tony:'#1d4ed8',nong:'#065f46',both:'#92400e'};
+  const OWNER_BG={tony:'#dbeafe',nong:'#d1fae5',both:'#fef3c7'};
+
+  let projs=[...x.projects].sort((a,b)=>new Date(b.cre)-new Date(a.cre));
+
+  // Filter by search query — check name, location, type
+  if(q){
+    projs=projs.filter(p=>{
+      const typeText=TYPE_LBL[p.type]||p.type;
+      return [p.name,p.loc,typeText,p.notes,p.val,p.bath].some(v=>v&&v.toLowerCase().includes(q));
+    });
+  }
+  // Filter by owner
+  if(ownerF) projs=projs.filter(p=>(p.owner||'tony')===ownerF);
+  // Filter by stage
+  if(stageF) projs=projs.filter(p=>p.stage===stageF);
+
+  // Update count label
+  const countEl=document.getElementById('projCount');
+  if(countEl){
+    if(q||ownerF||stageF) countEl.textContent=`แสดง ${projs.length} จาก ${x.projects.length} โครงการ`;
+    else countEl.textContent=`โครงการทั้งหมด ${x.projects.length} รายการ`;
+  }
+
+  if(!projs.length){
+    el.innerHTML=`<div class="empty"><div class="empty-ico">${q?'🔍':'🏗️'}</div><div>${q?`ไม่พบโครงการที่ตรงกับ "<b>${q}</b>"`:'ยังไม่มีโครงการ<br>กด "+ เพิ่มโครงการ" เพื่อเริ่มต้น'}</div></div>`;
+    return;
+  }
+
+  el.innerHTML=projs.map(p=>{
     const conts=x.contacts.filter(c=>c.projId===p.id);
     const cids=conts.map(c=>c.id);
     const acts=x.activities.filter(a=>cids.includes(a.cid));
     const pend=x.activities.filter(a=>cids.includes(a.cid)&&a.fuDate&&!a.fuDone);
     const intd=conts.filter(c=>c.status==='interested').length;
+    const owner=p.owner||'tony';
+    // Highlight search match in name
+    const dispName=q&&p.name.toLowerCase().includes(q)
+      ?p.name.replace(new RegExp('('+q+')','gi'),'<mark style="background:#fef9c3;padding:0 2px;border-radius:2px">$1</mark>')
+      :p.name;
     return`<div class="proj-card">
       <div class="proj-card-hdr" onclick="showProjDetail('${p.id}')">
-        <div>
-          <div class="proj-name">${p.name}</div>
+        <div style="flex:1">
+          <div class="proj-name">${dispName}</div>
           <div class="proj-meta">
             <span>${TYPE_LBL[p.type]||p.type}</span>
-            ${p.loc?`<span>📍 ${p.loc}</span>`:''}
+            ${p.loc?`<span>📍 ${q&&p.loc.toLowerCase().includes(q)?`<mark style="background:#fef9c3;padding:0 2px;border-radius:2px">${p.loc}</mark>`:p.loc}</span>`:''}
             ${p.year?`<span>📅 เสร็จปี ${p.year}</span>`:''}
             ${p.bath?`<span>🚽 ~${p.bath} ห้องน้ำ</span>`:''}
           </div>
         </div>
         <div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px">
+          <span class="badge" style="background:${OWNER_BG[owner]};color:${OWNER_COL[owner]}">${OWNER_LBL[owner]}</span>
           <span class="badge ${STAGE_CLS[p.stage]}">${STAGE_LBL[p.stage]}</span>
           ${pend.length?`<span class="badge b-followup">🔔 ${pend.length} ต้องตาม</span>`:''}
           ${intd?`<span class="badge b-interested">✅ ${intd} สนใจ</span>`:''}
@@ -1622,11 +1691,20 @@ function renderRpt(){
 
 // ── SEARCH ─────────────────────────────────────────────────────
 function doGSearch(){
-  const q=document.getElementById('gSearch').value;
+  const q=document.getElementById('gSearch').value.trim();
   if(!q)return;
-  showTab('cont');
-  document.getElementById('contSearch').value=q;
-  renderConts();
+  // Check if query matches a location keyword → go to projects tab
+  const locKeywords=['กรุงเทพ','ระยอง','ชลบุรี','เชียงใหม่','ภูเก็ต','พัทยา','นนทบุรี','ปทุม','สมุทร','อยุธยา','ขอนแก่น','หัวหิน','สมุทรปราการ'];
+  const isLocSearch=locKeywords.some(k=>q.toLowerCase().includes(k.toLowerCase()))||q.length<=10;
+  if(isLocSearch){
+    showTab('proj');
+    document.getElementById('projSearch').value=q;
+    renderProjs();
+  } else {
+    showTab('cont');
+    document.getElementById('contSearch').value=q;
+    renderConts();
+  }
 }
 
 // ── IMPORT / EXPORT ───────────────────────────────────────────
