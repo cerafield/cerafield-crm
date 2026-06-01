@@ -274,11 +274,11 @@ textarea{resize:vertical;min-height:75px}
   <div class="stats-grid" id="statsGrid"></div>
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px" class="two-col">
     <div class="card">
-      <div class="sec-hdr"><div class="sec-title">🔔 ต้องตาม / Follow up</div></div>
+      <div class="sec-hdr"><div class="sec-title" id="lblSecFollowup">🔔 ต้องตาม / Follow up</div></div>
       <div id="fuList"></div>
     </div>
     <div class="card">
-      <div class="sec-hdr"><div class="sec-title">🕐 กิจกรรมล่าสุด</div></div>
+      <div class="sec-hdr"><div class="sec-title" id="lblSecRecent">🕐 กิจกรรมล่าสุด</div></div>
       <div id="recentActs"></div>
     </div>
   </div>
@@ -288,8 +288,8 @@ textarea{resize:vertical;min-height:75px}
 <div id="panel-proj" class="panel">
   <div id="proj-list-view">
     <div class="sec-hdr">
-      <div class="sec-title">🏗️ โครงการทั้งหมด</div>
-      <button class="btn btn-primary" onclick="openProjModal()">+ เพิ่มโครงการ</button>
+      <div class="sec-title" id="lblSecProj">🏗️ โครงการทั้งหมด</div>
+      <button class="btn btn-primary" onclick="openProjModal()"><span id="lblBtnAddProj">+ เพิ่มโครงการ</span></button>
     </div>
     <!-- SEARCH + FILTER BAR -->
     <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap">
@@ -322,8 +322,8 @@ textarea{resize:vertical;min-height:75px}
 <!-- ===== CONTACTS ===== -->
 <div id="panel-cont" class="panel">
   <div class="sec-hdr">
-    <div class="sec-title">👥 ผู้ติดต่อทั้งหมด</div>
-    <button class="btn btn-primary" onclick="openContModal()">+ เพิ่มผู้ติดต่อ</button>
+    <div class="sec-title" id="lblSecCont">👥 ผู้ติดต่อทั้งหมด</div>
+    <button class="btn btn-primary" onclick="openContModal()"><span id="lblBtnAddCont">+ เพิ่มผู้ติดต่อ</span></button>
   </div>
   <div class="card">
     <input id="contSearch" placeholder="ค้นหา ชื่อ, บริษัท, โครงการ..." style="margin-bottom:14px" oninput="renderConts()">
@@ -334,8 +334,8 @@ textarea{resize:vertical;min-height:75px}
 <!-- ===== ACTIVITIES ===== -->
 <div id="panel-act" class="panel">
   <div class="sec-hdr">
-    <div class="sec-title">📋 ประวัติกิจกรรมทั้งหมด</div>
-    <button class="btn btn-primary" onclick="openActModal()">+ บันทึกกิจกรรม</button>
+    <div class="sec-title" id="lblSecAct">📋 ประวัติกิจกรรมทั้งหมด</div>
+    <button class="btn btn-primary" onclick="openActModal()"><span id="lblBtnAddAct">+ บันทึกกิจกรรม</span></button>
   </div>
   <div class="card">
     <div id="actTable"></div>
@@ -1219,7 +1219,27 @@ const _TH={
   act:{call:'📞 โทร',email:'📧 อีเมล',line:'💬 LINE',meeting:'🤝 พบ',other:'•'},
   status:{new:'🆕 ใหม่',contacted:'📞 ติดต่อแล้ว',catalog_sent:'📄 ส่ง Catalog',email_sent:'📧 ส่งอีเมล',line_sent:'💬 ส่ง LINE',followup:'🔔 รอตาม',interested:'✅ สนใจ',not_interested:'❌ ไม่สนใจ'},
   stat:['โครงการ','ผู้ติดต่อ','เลย Follow up','ต้องตามวันนี้'],
-  done:'ตามแล้ว ✓',allGood:'ไม่มีรายการค้างครับ 🎉',noAct:'ยังไม่มีกิจกรรม'
+  done:'ตามแล้ว ✓',allGood:'ไม่มีรายการค้างครับ 🎉',noAct:'ยังไม่มีกิจกรรม',
+  ui:{
+    secProj:'🏗️ โครงการทั้งหมด',secCont:'👥 ผู้ติดต่อทั้งหมด',secAct:'📋 ประวัติกิจกรรมทั้งหมด',
+    secFollowup:'🔔 ต้องตาม / Follow up',secRecent:'🕐 กิจกรรมล่าสุด',
+    secProjConts:'👥 ผู้ติดต่อในโครงการ',secTimeline:'📋 Timeline กิจกรรม',
+    addProj:'+ เพิ่มโครงการ',addCont:'+ เพิ่มผู้ติดต่อ',addAct:'+ บันทึกกิจกรรม',addPerson:'+ เพิ่มคน',logNew:'+ บันทึกใหม่',
+    edit:'แก้ไข',del:'ลบ',close:'ปิด',
+    searchProj:'ค้นหา จังหวัด / ชื่อโครงการ / ประเภท...',searchCont:'ค้นหา ชื่อ, บริษัท, โครงการ...',
+    filterAll:'👤 ทุกคน',filterAllStage:'📋 ทุกขั้นตอน',
+    thName:'ชื่อ / ตำแหน่ง',thCo:'บริษัท / บทบาท',thProj:'โครงการ',thContact:'ติดต่อ',thStatus:'สถานะ',thLast:'ล่าสุด',
+    thDate:'วันที่',thType:'ประเภท',thCont:'ผู้ติดต่อ',thSummary:'สรุป',thNext:'Next Action',thFU:'Follow Up',
+    nPerson:(n)=>`${n} คน`,nAct:(n)=>`${n} กิจกรรม`,
+    showing:(n,t)=>`แสดง ${n} จาก ${t} โครงการ`,total:(n)=>`โครงการทั้งหมด ${n} รายการ`,
+    noProj:'ยังไม่มีโครงการ',noProjHint:'กด "+ เพิ่มโครงการ" เพื่อเริ่มต้น',noMatch:(q)=>`ไม่พบโครงการที่ตรงกับ "<b>${q}</b>"`,
+    noCont:'ไม่พบผู้ติดต่อ',noActs:'ยังไม่มีกิจกรรม',noContInProj:'ยังไม่มีผู้ติดต่อ',
+    rptTracked:'โครงการที่ติดตาม',rptTotCont:'ผู้ติดต่อทั้งหมด',rptTotAct:'กิจกรรมทั้งหมด',rptInterested:'สนใจสินค้า',
+    rptDetails:'📊 รายละเอียดแต่ละโครงการ',rptDataAs:'ข้อมูล ณ วันที่',
+    thStage:'ขั้นตอน',thYear:'เสร็จปี',thFUcol:'ต้องตาม',thOverview:'ภาพรวม',
+    ovProspect:'🔎 กำลังหา',ovInterested:'✅ มีที่สนใจ',ovSent:'📤 ส่งข้อมูลแล้ว',ovContacted:'📞 ติดต่อแล้ว',
+    doneBtn:'ตามแล้ว ✓',doneTxt:'ตามแล้ว ✓',followTxt:(d,dt)=>`ตาม: ${d} (${dt})`
+  }
 };
 const _EN={
   nav:['🏠 Overview','🏗️ Projects','👥 Contacts','📋 Activities','📊 Report','📦 Logistics'],
@@ -1229,7 +1249,27 @@ const _EN={
   act:{call:'📞 Call',email:'📧 Email',line:'💬 LINE',meeting:'🤝 Meeting',other:'•'},
   status:{new:'🆕 New',contacted:'📞 Contacted',catalog_sent:'📄 Catalog Sent',email_sent:'📧 Email Sent',line_sent:'💬 LINE Sent',followup:'🔔 Follow up',interested:'✅ Interested',not_interested:'❌ Not Interested'},
   stat:['Projects','Contacts','Overdue','Due Today'],
-  done:'Done ✓',allGood:'All caught up! 🎉',noAct:'No activities yet'
+  done:'Done ✓',allGood:'All caught up! 🎉',noAct:'No activities yet',
+  ui:{
+    secProj:'🏗️ All Projects',secCont:'👥 All Contacts',secAct:'📋 All Activities',
+    secFollowup:'🔔 Follow up',secRecent:'🕐 Recent Activities',
+    secProjConts:'👥 Project Contacts',secTimeline:'📋 Activity Timeline',
+    addProj:'+ Add Project',addCont:'+ Add Contact',addAct:'+ Log Activity',addPerson:'+ Add Contact',logNew:'+ Log New',
+    edit:'Edit',del:'Delete',close:'Close',
+    searchProj:'Search province / project / type...',searchCont:'Search name, company, project...',
+    filterAll:'👤 Everyone',filterAllStage:'📋 All Stages',
+    thName:'Name / Position',thCo:'Company / Role',thProj:'Project',thContact:'Contact Info',thStatus:'Status',thLast:'Last Activity',
+    thDate:'Date',thType:'Type',thCont:'Contact',thSummary:'Summary',thNext:'Next Action',thFU:'Follow Up',
+    nPerson:(n)=>`${n} contacts`,nAct:(n)=>`${n} activities`,
+    showing:(n,t)=>`Showing ${n} of ${t} projects`,total:(n)=>`${n} projects total`,
+    noProj:'No projects yet',noProjHint:'Click "+ Add Project" to get started',noMatch:(q)=>`No projects match "<b>${q}</b>"`,
+    noCont:'No contacts found',noActs:'No activities yet',noContInProj:'No contacts yet',
+    rptTracked:'Projects Tracked',rptTotCont:'Total Contacts',rptTotAct:'Total Activities',rptInterested:'Interested',
+    rptDetails:'📊 Project Details',rptDataAs:'Data as of',
+    thStage:'Stage',thYear:'Completion',thFUcol:'Follow-up',thOverview:'Overview',
+    ovProspect:'🔎 Prospecting',ovInterested:'✅ Interested',ovSent:'📤 Info Sent',ovContacted:'📞 Contacted',
+    doneBtn:'Done ✓',doneTxt:'Done ✓',followTxt:(d,dt)=>`Follow: ${d} (${dt})`
+  }
 };
 
 // ── LOOKUP MAPS (mutable — updated by applyLang) ──────────────
@@ -1261,9 +1301,22 @@ function applyLang(lang){
   Object.assign(ROLE_LBL,L.role);
   Object.assign(ACT_LBL,L.act);
   Object.keys(STATUS).forEach(k=>{if(L.status[k])STATUS[k].lbl=L.status[k]});
+  // Nav tabs
   document.querySelectorAll('.nav-tab').forEach((t,i)=>{if(L.nav[i])t.textContent=L.nav[i]});
+  // Lang button
   const btn=document.getElementById('langBtn');
   if(btn)btn.innerHTML=lang==='en'?'🇹🇭 TH':'🇬🇧 EN';
+  // Static panel labels (section titles, buttons, placeholders)
+  const u=L.ui;
+  const _set=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v};
+  const _ph=(id,v)=>{const e=document.getElementById(id);if(e)e.placeholder=v};
+  const _opt=(id,i,v)=>{const e=document.getElementById(id);if(e&&e.options[i])e.options[i].text=v};
+  _set('lblSecProj',u.secProj);_set('lblBtnAddProj',u.addProj);
+  _set('lblSecCont',u.secCont);_set('lblBtnAddCont',u.addCont);
+  _set('lblSecAct',u.secAct);_set('lblBtnAddAct',u.addAct);
+  _set('lblSecFollowup',u.secFollowup);_set('lblSecRecent',u.secRecent);
+  _ph('projSearch',u.searchProj);_ph('contSearch',u.searchCont);
+  _opt('projOwnerFilter',0,u.filterAll);_opt('projStageFilter',0,u.filterAllStage);
   if(!fbReady)return;
   const panel=document.querySelector('.panel.active');
   if(!panel)return;
@@ -1364,6 +1417,7 @@ function delProj(id){
 
 function renderProjs(){
   const x=db();const el=document.getElementById('projList');
+  const _L=LANG==='en'?_EN:_TH;const u=_L.ui;
   const q=(document.getElementById('projSearch')?.value||'').toLowerCase().trim();
   const ownerF=document.getElementById('projOwnerFilter')?.value||'';
   const stageF=document.getElementById('projStageFilter')?.value||'';
@@ -1389,12 +1443,12 @@ function renderProjs(){
   // Update count label
   const countEl=document.getElementById('projCount');
   if(countEl){
-    if(q||ownerF||stageF) countEl.textContent=`แสดง ${projs.length} จาก ${x.projects.length} โครงการ`;
-    else countEl.textContent=`โครงการทั้งหมด ${x.projects.length} รายการ`;
+    if(q||ownerF||stageF) countEl.textContent=u.showing(projs.length,x.projects.length);
+    else countEl.textContent=u.total(x.projects.length);
   }
 
   if(!projs.length){
-    el.innerHTML=`<div class="empty"><div class="empty-ico">${q?'🔍':'🏗️'}</div><div>${q?`ไม่พบโครงการที่ตรงกับ "<b>${q}</b>"`:'ยังไม่มีโครงการ<br>กด "+ เพิ่มโครงการ" เพื่อเริ่มต้น'}</div></div>`;
+    el.innerHTML=`<div class="empty"><div class="empty-ico">${q?'🔍':'🏗️'}</div><div>${q?u.noMatch(q):u.noProj+'<br>'+u.noProjHint}</div></div>`;
     return;
   }
 
@@ -1428,12 +1482,12 @@ function renderProjs(){
         </div>
       </div>
       <div class="proj-ftr">
-        <span style="font-size:12px;color:var(--gray)">👥 ${conts.length} คน</span>
-        <span style="font-size:12px;color:var(--gray)">📝 ${acts.length} กิจกรรม</span>
+        <span style="font-size:12px;color:var(--gray)">👥 ${u.nPerson(conts.length)}</span>
+        <span style="font-size:12px;color:var(--gray)">📝 ${u.nAct(acts.length)}</span>
         <div style="flex:1"></div>
-        <button class="btn btn-sm btn-ghost" onclick="event.stopPropagation();openProjModal('${p.id}')">แก้ไข</button>
-        <button class="btn btn-sm btn-primary" onclick="event.stopPropagation();openContModalForProj('${p.id}')">+ เพิ่มคน</button>
-        <button class="btn btn-sm btn-danger" onclick="event.stopPropagation();delProj('${p.id}')">ลบ</button>
+        <button class="btn btn-sm btn-ghost" onclick="event.stopPropagation();openProjModal('${p.id}')">${u.edit}</button>
+        <button class="btn btn-sm btn-primary" onclick="event.stopPropagation();openContModalForProj('${p.id}')">${u.addPerson}</button>
+        <button class="btn btn-sm btn-danger" onclick="event.stopPropagation();delProj('${p.id}')">${u.del}</button>
       </div>
     </div>`}).join('');
 }
@@ -1443,6 +1497,7 @@ function showProjDetail(pid){document.getElementById('proj-list-view').style.dis
 
 function renderProjDetail(pid){
   const x=db();const p=x.projects.find(q=>q.id===pid);if(!p)return;
+  const _L=LANG==='en'?_EN:_TH;const u=_L.ui;
   const conts=x.contacts.filter(c=>c.projId===pid);
   const cids=conts.map(c=>c.id);
   const acts=[...x.activities].filter(a=>cids.includes(a.cid)).sort((a,b)=>new Date(b.date)-new Date(a.date));
@@ -1460,10 +1515,10 @@ function renderProjDetail(pid){
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px" class="two-col">
       <div>
         <div class="sec-hdr">
-          <div class="sec-title">👥 ผู้ติดต่อในโครงการ</div>
-          <button class="btn btn-sm btn-primary" onclick="openContModalForProj('${pid}')">+ เพิ่มคน</button>
+          <div class="sec-title">${u.secProjConts}</div>
+          <button class="btn btn-sm btn-primary" onclick="openContModalForProj('${pid}')">${u.addPerson}</button>
         </div>
-        ${!conts.length?`<div class="card"><div class="empty"><div class="empty-ico">👤</div><div>ยังไม่มีผู้ติดต่อ</div></div></div>`:
+        ${!conts.length?`<div class="card"><div class="empty"><div class="empty-ico">👤</div><div>${u.noContInProj}</div></div></div>`:
         Object.entries(byco).map(([co,cs])=>`
           <div class="card" style="margin-bottom:12px">
             <div style="font-size:12px;font-weight:800;color:var(--navy);margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--border)">🏢 ${co}</div>
@@ -1484,14 +1539,14 @@ function renderProjDetail(pid){
                   </div>
                   ${la?`<div style="font-size:11px;color:var(--gray);margin-top:3px">ล่าสุด: ${fmtDate(la.date)}</div>`:''}
                 </div>
-                <button class="btn btn-sm btn-gold" onclick="event.stopPropagation();openActForCont('${c.id}')">+ บันทึก</button>
+                <button class="btn btn-sm btn-gold" onclick="event.stopPropagation();openActForCont('${c.id}')">${u.logNew}</button>
               </div>`}).join('')}
           </div>`).join('')}
       </div>
       <div>
-        <div class="sec-hdr"><div class="sec-title">📋 Timeline กิจกรรม</div></div>
+        <div class="sec-hdr"><div class="sec-title">${u.secTimeline}</div></div>
         <div class="card">
-          ${!acts.length?`<div class="empty"><div class="empty-ico">📋</div><div>ยังไม่มีกิจกรรม</div></div>`:
+          ${!acts.length?`<div class="empty"><div class="empty-ico">📋</div><div>${u.noActs}</div></div>`:
           acts.map(a=>{
             const c=x.contacts.find(q=>q.id===a.cid);
             return`<div class="act-item">
@@ -1573,12 +1628,13 @@ function delCont(id){
 }
 
 function renderConts(){
-  const x=db();const q=(document.getElementById('contSearch')?.value||'').toLowerCase();
+  const x=db();const _L=LANG==='en'?_EN:_TH;const u=_L.ui;
+  const q=(document.getElementById('contSearch')?.value||'').toLowerCase();
   const el=document.getElementById('contTable');
   let cs=x.contacts;
   if(q)cs=cs.filter(c=>{const p=x.projects.find(pp=>pp.id===c.projId);return[c.name,c.co,c.pos,c.email,p?.name].some(v=>v&&v.toLowerCase().includes(q))});
-  if(!cs.length){el.innerHTML=`<div class="empty"><div class="empty-ico">👥</div><div>ไม่พบผู้ติดต่อ</div></div>`;return}
-  el.innerHTML=`<div class="tbl-wrap"><table><thead><tr><th>ชื่อ / ตำแหน่ง</th><th>บริษัท / บทบาท</th><th>โครงการ</th><th>ติดต่อ</th><th>สถานะ</th><th>ล่าสุด</th><th></th></tr></thead><tbody>${cs.map(c=>{
+  if(!cs.length){el.innerHTML=`<div class="empty"><div class="empty-ico">👥</div><div>${u.noCont}</div></div>`;return}
+  el.innerHTML=`<div class="tbl-wrap"><table><thead><tr><th>${u.thName}</th><th>${u.thCo}</th><th>${u.thProj}</th><th>${u.thContact}</th><th>${u.thStatus}</th><th>${u.thLast}</th><th></th></tr></thead><tbody>${cs.map(c=>{
     const p=x.projects.find(pp=>pp.id===c.projId);
     const la=x.activities.filter(a=>a.cid===c.id).sort((a,b)=>new Date(b.date)-new Date(a.date))[0];
     const si=STATUS[c.status]||STATUS.new;
@@ -1589,7 +1645,7 @@ function renderConts(){
       <td style="font-size:12px">${[c.phone?'📞 '+c.phone:'',c.email?'📧 '+c.email:'',c.lineAdded?'💬 LINE ✓':''].filter(Boolean).join('<br>')}</td>
       <td><span class="badge ${si.cls}">${si.lbl}</span></td>
       <td style="font-size:12px;color:var(--gray)">${la?fmtDate(la.date):'—'}</td>
-      <td><button class="btn btn-sm btn-gold" onclick="event.stopPropagation();openActForCont('${c.id}')">+ บันทึก</button></td>
+      <td><button class="btn btn-sm btn-gold" onclick="event.stopPropagation();openActForCont('${c.id}')">${u.logNew}</button></td>
     </tr>`}).join('')}</tbody></table></div>`;
 }
 
@@ -1695,10 +1751,11 @@ function saveAct(){
 }
 
 function renderActs(){
-  const x=db();const el=document.getElementById('actTable');
+  const x=db();const _L=LANG==='en'?_EN:_TH;const u=_L.ui;
+  const el=document.getElementById('actTable');
   const acts=[...x.activities].sort((a,b)=>new Date(b.date)-new Date(a.date));
-  if(!acts.length){el.innerHTML=`<div class="empty"><div class="empty-ico">📋</div><div>ยังไม่มีกิจกรรม</div></div>`;return}
-  el.innerHTML=`<div class="tbl-wrap"><table><thead><tr><th>วันที่</th><th>ประเภท</th><th>ผู้ติดต่อ</th><th>โครงการ</th><th>สรุป</th><th>Next Action</th><th>Follow up</th></tr></thead><tbody>${acts.map(a=>{
+  if(!acts.length){el.innerHTML=`<div class="empty"><div class="empty-ico">📋</div><div>${u.noActs}</div></div>`;return}
+  el.innerHTML=`<div class="tbl-wrap"><table><thead><tr><th>${u.thDate}</th><th>${u.thType}</th><th>${u.thCont}</th><th>${u.thProj}</th><th>${u.thSummary}</th><th>${u.thNext}</th><th>${u.thFU}</th></tr></thead><tbody>${acts.map(a=>{
     const c=x.contacts.find(q=>q.id===a.cid);
     const p=c?x.projects.find(q=>q.id===c.projId):null;
     return`<tr>
@@ -1781,21 +1838,21 @@ function renderDash(){
 
 // ── REPORT ─────────────────────────────────────────────────────
 function renderRpt(){
-  const x=db();
-  document.getElementById('rptDate').textContent='ข้อมูล ณ วันที่ '+fmtDate(today());
+  const x=db();const _L=LANG==='en'?_EN:_TH;const u=_L.ui;
+  document.getElementById('rptDate').textContent=u.rptDataAs+' '+fmtDate(today());
   const intd=x.contacts.filter(c=>c.status==='interested').length;
   const cont=x.contacts.filter(c=>c.status!=='new').length;
   const pend=x.activities.filter(a=>a.fuDate&&!a.fuDone).length;
   document.getElementById('rptContent').innerHTML=`
     <div class="stats-grid" style="margin-bottom:20px">
-      <div class="stat-card"><div class="stat-num">${x.projects.length}</div><div class="stat-lbl">โครงการที่ติดตาม</div></div>
-      <div class="stat-card"><div class="stat-num">${x.contacts.length}</div><div class="stat-lbl">ผู้ติดต่อทั้งหมด</div></div>
-      <div class="stat-card"><div class="stat-num">${x.activities.length}</div><div class="stat-lbl">กิจกรรมทั้งหมด</div></div>
-      <div class="stat-card green"><div class="stat-num">${intd}</div><div class="stat-lbl">สนใจสินค้า</div></div>
+      <div class="stat-card"><div class="stat-num">${x.projects.length}</div><div class="stat-lbl">${u.rptTracked}</div></div>
+      <div class="stat-card"><div class="stat-num">${x.contacts.length}</div><div class="stat-lbl">${u.rptTotCont}</div></div>
+      <div class="stat-card"><div class="stat-num">${x.activities.length}</div><div class="stat-lbl">${u.rptTotAct}</div></div>
+      <div class="stat-card green"><div class="stat-num">${intd}</div><div class="stat-lbl">${u.rptInterested}</div></div>
     </div>
     <div class="card" style="margin-bottom:16px">
-      <div class="sec-title" style="margin-bottom:14px">📊 รายละเอียดแต่ละโครงการ</div>
-      <div class="tbl-wrap"><table><thead><tr><th>#</th><th>โครงการ</th><th>ประเภท</th><th>ขั้นตอน</th><th>เสร็จปี</th><th>ผู้ติดต่อ</th><th>กิจกรรม</th><th>ต้องตาม</th><th>ภาพรวม</th></tr></thead><tbody>
+      <div class="sec-title" style="margin-bottom:14px">${u.rptDetails}</div>
+      <div class="tbl-wrap"><table><thead><tr><th>#</th><th>${u.thProj}</th><th>${u.thType}</th><th>${u.thStage}</th><th>${u.thYear}</th><th>${u.thCont}</th><th>${LANG==='en'?'Activities':'กิจกรรม'}</th><th>${u.thFUcol}</th><th>${u.thOverview}</th></tr></thead><tbody>
       ${x.projects.map((p,i)=>{
         const cs=x.contacts.filter(c=>c.projId===p.id);
         const cids=cs.map(c=>c.id);
@@ -1804,10 +1861,10 @@ function renderRpt(){
         const hasInt=cs.some(c=>c.status==='interested');
         const hasSent=cs.some(c=>['catalog_sent','email_sent','line_sent'].includes(c.status));
         const hasCont=cs.some(c=>c.status==='contacted');
-        let ovr='🔎 กำลังหา';
-        if(hasInt)ovr='✅ มีที่สนใจ';
-        else if(hasSent)ovr='📤 ส่งข้อมูลแล้ว';
-        else if(hasCont)ovr='📞 ติดต่อแล้ว';
+        let ovr=u.ovProspect;
+        if(hasInt)ovr=u.ovInterested;
+        else if(hasSent)ovr=u.ovSent;
+        else if(hasCont)ovr=u.ovContacted;
         return`<tr>
           <td style="color:var(--gray)">${i+1}</td>
           <td style="font-weight:700;cursor:pointer;color:var(--navy)" onclick="showTab('proj');setTimeout(()=>showProjDetail('${p.id}'),100)">${p.name}</td>
