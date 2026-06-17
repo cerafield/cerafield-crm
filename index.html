@@ -263,6 +263,7 @@ textarea{resize:vertical;min-height:75px}
   <div class="nav-tab" onclick="showTab('proj')">🏗️ โครงการ</div>
   <div class="nav-tab" onclick="showTab('cont')">👥 ผู้ติดต่อ</div>
   <div class="nav-tab" onclick="showTab('act')">📋 กิจกรรม</div>
+  <div class="nav-tab" onclick="showTab('mail')">📧 อีเมล / ตามงาน</div>
   <div class="nav-tab" onclick="showTab('rpt')">📊 รายงาน</div>
   <div class="nav-tab" onclick="showTab('logi')">📦 โลจิสติกส์</div>
 </div>
@@ -339,6 +340,39 @@ textarea{resize:vertical;min-height:75px}
   </div>
   <div class="card">
     <div id="actTable"></div>
+  </div>
+</div>
+
+<!-- ===== EMAIL / FOLLOW-UP ===== -->
+<div id="panel-mail" class="panel">
+  <div class="sec-hdr">
+    <div class="sec-title" id="lblSecMail">📧 อีเมล / ตามงาน</div>
+    <button class="btn btn-primary" onclick="openActModal()"><span id="lblBtnAddMail">+ บันทึกการส่ง</span></button>
+  </div>
+  <div class="stats-grid" id="mailStats" style="margin-bottom:16px"></div>
+  <div class="card">
+    <div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap">
+      <select id="mailRoleFilter" onchange="renderMail()" style="width:170px">
+        <option value="">👤 ทุกบทบาท</option>
+        <option value="owner">เจ้าของโครงการ</option>
+        <option value="architect">สถาปนิก</option>
+        <option value="interior">ออกแบบภายใน</option>
+        <option value="contractor">ผู้รับเหมา (GC)</option>
+        <option value="mep">MEP</option>
+        <option value="qs">QS</option>
+        <option value="pm">PM</option>
+        <option value="proc">จัดซื้อ</option>
+        <option value="other">อื่นๆ</option>
+      </select>
+      <select id="mailStatFilter" onchange="renderMail()" style="width:170px">
+        <option value="pending">🔔 ที่ต้องตาม</option>
+        <option value="overdue">🔴 เลยกำหนด</option>
+        <option value="today">⭐ วันนี้</option>
+        <option value="done">✅ ตามแล้ว</option>
+        <option value="all">📋 ทั้งหมด</option>
+      </select>
+    </div>
+    <div id="mailTable"></div>
   </div>
 </div>
 
@@ -1167,6 +1201,14 @@ textarea{resize:vertical;min-height:75px}
         <div class="fg"><label>สิ่งที่ต้องทำต่อ (Next Action)</label><input id="fActNext" placeholder="เช่น โทรตาม ID ของโปรเจค, ส่งใบเสนอราคา"></div>
         <div class="fg"><label>📅 วัน Follow up</label><input type="date" id="fActFU"></div>
       </div>
+      <div class="fg">
+        <label>📎 ส่งเอกสารอะไรไปบ้าง</label>
+        <div style="display:flex;gap:16px;flex-wrap:wrap;padding:6px 2px">
+          <label style="display:flex;align-items:center;gap:6px;font-weight:500;cursor:pointer"><input type="checkbox" id="fActCatalog" style="width:auto;margin:0"> 📄 Catalog</label>
+          <label style="display:flex;align-items:center;gap:6px;font-weight:500;cursor:pointer"><input type="checkbox" id="fActCP" style="width:auto;margin:0"> 📁 Company Profile</label>
+          <label style="display:flex;align-items:center;gap:6px;font-weight:500;cursor:pointer"><input type="checkbox" id="fActQuote" style="width:auto;margin:0"> 💰 ใบเสนอราคา</label>
+        </div>
+      </div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeM('mAct')">ยกเลิก</button>
@@ -1274,6 +1316,7 @@ function setupFirebase(){
       else if(tid==='proj')renderProjs();
       else if(tid==='cont')renderConts();
       else if(tid==='act')renderActs();
+      else if(tid==='mail')renderMail();
       else if(tid==='rpt')renderRpt();
     }
   });
@@ -1283,7 +1326,7 @@ function uid(){return Date.now().toString(36)+Math.random().toString(36).substr(
 // ── LANGUAGE ──────────────────────────────────────────────────
 let LANG=localStorage.getItem('cera_lang')||'th';
 const _TH={
-  nav:['🏠 ภาพรวม','🏗️ โครงการ','👥 ผู้ติดต่อ','📋 กิจกรรม','📊 รายงาน','📦 โลจิสติกส์'],
+  nav:['🏠 ภาพรวม','🏗️ โครงการ','👥 ผู้ติดต่อ','📋 กิจกรรม','📧 อีเมล / ตามงาน','📊 รายงาน','📦 โลจิสติกส์'],
   type:{hotel:'โรงแรม',condo:'คอนโด',hospital:'โรงพยาบาล',office:'สำนักงาน',retail:'ศูนย์การค้า',residential:'บ้าน',government:'ราชการ',other:'อื่นๆ'},
   stage:{design:'🎨 ออกแบบ',construction:'🏗️ ก่อสร้าง',procurement:'🛒 จัดซื้อ',completed:'✅ เสร็จแล้ว'},
   role:{owner:'เจ้าของโครงการ',architect:'สถาปนิก',interior:'ออกแบบภายใน',contractor:'ผู้รับเหมา (GC)',mep:'MEP',qs:'QS',pm:'PM',proc:'จัดซื้อ',other:'อื่นๆ'},
@@ -1293,6 +1336,7 @@ const _TH={
   done:'ตามแล้ว ✓',allGood:'ไม่มีรายการค้างครับ 🎉',noAct:'ยังไม่มีกิจกรรม',
   ui:{
     secProj:'🏗️ โครงการทั้งหมด',secCont:'👥 ผู้ติดต่อทั้งหมด',secAct:'📋 ประวัติกิจกรรมทั้งหมด',
+    secMail:'📧 อีเมล / ตามงาน',addMail:'+ บันทึกการส่ง',
     secFollowup:'🔔 ต้องตาม / Follow up',secRecent:'🕐 กิจกรรมล่าสุด',
     secProjConts:'👥 ผู้ติดต่อในโครงการ',secTimeline:'📋 Timeline กิจกรรม',
     addProj:'+ เพิ่มโครงการ',addCont:'+ เพิ่มผู้ติดต่อ',addAct:'+ บันทึกกิจกรรม',addPerson:'+ เพิ่มคน',logNew:'+ บันทึกใหม่',
@@ -1313,7 +1357,7 @@ const _TH={
   }
 };
 const _EN={
-  nav:['🏠 Overview','🏗️ Projects','👥 Contacts','📋 Activities','📊 Report','📦 Logistics'],
+  nav:['🏠 Overview','🏗️ Projects','👥 Contacts','📋 Activities','📧 Email / Follow-up','📊 Report','📦 Logistics'],
   type:{hotel:'Hotel',condo:'Condo',hospital:'Hospital',office:'Office',retail:'Retail/Mall',residential:'Housing',government:'Government',other:'Other'},
   stage:{design:'🎨 Design',construction:'🏗️ Construction',procurement:'🛒 Procurement',completed:'✅ Completed'},
   role:{owner:'Owner',architect:'Architect',interior:'Interior Design',contractor:'Contractor (GC)',mep:'MEP',qs:'QS',pm:'PM',proc:'Procurement',other:'Other'},
@@ -1323,6 +1367,7 @@ const _EN={
   done:'Done ✓',allGood:'All caught up! 🎉',noAct:'No activities yet',
   ui:{
     secProj:'🏗️ All Projects',secCont:'👥 All Contacts',secAct:'📋 All Activities',
+    secMail:'📧 Email / Follow-up',addMail:'+ Log a send',
     secFollowup:'🔔 Follow up',secRecent:'🕐 Recent Activities',
     secProjConts:'👥 Project Contacts',secTimeline:'📋 Activity Timeline',
     addProj:'+ Add Project',addCont:'+ Add Contact',addAct:'+ Log Activity',addPerson:'+ Add Contact',logNew:'+ Log New',
@@ -1385,6 +1430,7 @@ function applyLang(lang){
   _set('lblSecProj',u.secProj);_set('lblBtnAddProj',u.addProj);
   _set('lblSecCont',u.secCont);_set('lblBtnAddCont',u.addCont);
   _set('lblSecAct',u.secAct);_set('lblBtnAddAct',u.addAct);
+  _set('lblSecMail',u.secMail);_set('lblBtnAddMail',u.addMail);
   _set('lblSecFollowup',u.secFollowup);_set('lblSecRecent',u.secRecent);
   _ph('projSearch',u.searchProj);_ph('contSearch',u.searchCont);
   _opt('projOwnerFilter',0,u.filterAll);_opt('projStageFilter',0,u.filterAllStage);
@@ -1396,6 +1442,7 @@ function applyLang(lang){
   else if(tid==='proj')renderProjs();
   else if(tid==='cont')renderConts();
   else if(tid==='act')renderActs();
+  else if(tid==='mail')renderMail();
   else if(tid==='rpt')renderRpt();
 }
 function toggleLang(){applyLang(LANG==='th'?'en':'th')}
@@ -1404,13 +1451,14 @@ function toggleLang(){applyLang(LANG==='th'?'en':'th')}
 function showTab(name){
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
-  const idx={dash:0,proj:1,cont:2,act:3,rpt:4,logi:5};
+  const idx={dash:0,proj:1,cont:2,act:3,mail:4,rpt:5,logi:6};
   document.getElementById('panel-'+name).classList.add('active');
   document.querySelectorAll('.nav-tab')[idx[name]].classList.add('active');
   if(name==='dash')renderDash();
   if(name==='proj')renderProjs();
   if(name==='cont')renderConts();
   if(name==='act')renderActs();
+  if(name==='mail')renderMail();
   if(name==='rpt')renderRpt();
 }
 
@@ -1798,6 +1846,9 @@ function openActModal(cid){
   document.getElementById('fActNext').value='';
   document.getElementById('fActFU').value='';
   document.getElementById('fActStatus').value='';
+  document.getElementById('fActCatalog').checked=false;
+  document.getElementById('fActCP').checked=false;
+  document.getElementById('fActQuote').checked=false;
   openM('mAct');
 }
 
@@ -1809,13 +1860,20 @@ function saveAct(){
   const notes=document.getElementById('fActNotes').value.trim();
   if(!notes){alert('กรุณากรอกสรุปการคุย');return}
   const x=db();const c=x.contacts.find(q=>q.id===cid);
-  const data={cid,type:document.getElementById('fActType').value,date:document.getElementById('fActDate').value,notes,next:document.getElementById('fActNext').value.trim(),fuDate:document.getElementById('fActFU').value||null,fuDone:false,cre:new Date().toISOString()};
+  const sent=[];
+  if(document.getElementById('fActCatalog').checked)sent.push('catalog');
+  if(document.getElementById('fActCP').checked)sent.push('cp');
+  if(document.getElementById('fActQuote').checked)sent.push('quote');
+  const data={cid,type:document.getElementById('fActType').value,date:document.getElementById('fActDate').value,notes,next:document.getElementById('fActNext').value.trim(),fuDate:document.getElementById('fActFU').value||null,fuDone:false,sent,cre:new Date().toISOString()};
   x.activities.push({id:uid(),...data});
-  const ns=document.getElementById('fActStatus').value;
+  let ns=document.getElementById('fActStatus').value;
+  // Auto-bump status when docs were sent (only if user didn't pick one and contact isn't already further along)
+  if(!ns&&sent.length&&c){const adv=['interested'];if(!adv.includes(c.status))ns=sent.includes('catalog')?'catalog_sent':'email_sent'}
   if(ns&&c){const i=x.contacts.findIndex(q=>q.id===cid);if(i>=0)x.contacts[i].status=ns}
   save(x);closeM('mAct');toast('✅ บันทึกกิจกรรมแล้ว');
   const ap=document.querySelector('.panel.active');
   if(ap?.id==='panel-act')renderActs();
+  if(ap?.id==='panel-mail')renderMail();
   if(ap?.id==='panel-cont')renderConts();
   if(ap?.id==='panel-proj'&&document.getElementById('proj-detail-view').style.display!=='none'&&c)renderProjDetail(c.projId);
   renderDash();
@@ -1852,6 +1910,72 @@ function toggleFU(aid,pid){
   if(a){a.fuDone=!a.fuDone;save(x);toast(a.fuDone?'✅ ตามแล้ว!':'↩️ ยกเลิก')}
   if(pid)renderProjDetail(pid);
   renderDash();
+}
+
+// ── EMAIL / FOLLOW-UP ──────────────────────────────────────────
+const DOC_LBL={catalog:'📄 Catalog',cp:'📁 Company Profile',quote:'💰 ใบเสนอราคา'};
+function sentBadges(sent){
+  if(!sent||!sent.length)return'<span style="color:var(--gray);font-size:11px">—</span>';
+  return sent.map(s=>`<span class="badge b-catalog" style="font-size:10px;margin:1px">${DOC_LBL[s]||s}</span>`).join(' ');
+}
+function mailStat(lbl,n,col,key,active){
+  return`<div class="stat-card" style="cursor:pointer;${key===active?'outline:2px solid '+col+';outline-offset:-1px':''}" onclick="document.getElementById('mailStatFilter').value='${key}';renderMail()">
+    <div class="stat-num" style="color:${col}">${n}</div><div class="stat-lbl">${lbl}</div></div>`;
+}
+function renderMail(){
+  const x=db();const t=today();
+  const roleF=document.getElementById('mailRoleFilter')?.value||'';
+  const statF=document.getElementById('mailStatFilter')?.value||'pending';
+  // Relevant = activities that need a follow-up OR had documents sent — and have a valid contact
+  let items=x.activities.map(a=>{
+    const c=x.contacts.find(q=>q.id===a.cid);
+    const p=c?x.projects.find(q=>q.id===c.projId):null;
+    return{a,c,p};
+  }).filter(it=>it.c&&(it.a.fuDate||(it.a.sent&&it.a.sent.length)));
+  if(roleF)items=items.filter(it=>it.c.role===roleF);
+  // Counters (over the role-filtered set, only items with a follow-up date)
+  const fu=items.filter(it=>it.a.fuDate);
+  const cOver=fu.filter(it=>!it.a.fuDone&&it.a.fuDate<t).length;
+  const cToday=fu.filter(it=>!it.a.fuDone&&it.a.fuDate===t).length;
+  const cPend=fu.filter(it=>!it.a.fuDone).length;
+  const cDone=fu.filter(it=>it.a.fuDone).length;
+  document.getElementById('mailStats').innerHTML=
+    mailStat('🔴 เลยกำหนด',cOver,'var(--red)','overdue',statF)+
+    mailStat('⭐ วันนี้',cToday,'#f59e0b','today',statF)+
+    mailStat('🔔 รอตาม',cPend,'var(--navy)','pending',statF)+
+    mailStat('✅ ตามแล้ว',cDone,'var(--green)','done',statF);
+  // Status filter
+  let list=items;
+  if(statF==='overdue')list=items.filter(it=>it.a.fuDate&&!it.a.fuDone&&it.a.fuDate<t);
+  else if(statF==='today')list=items.filter(it=>it.a.fuDate===t&&!it.a.fuDone);
+  else if(statF==='pending')list=items.filter(it=>it.a.fuDate&&!it.a.fuDone);
+  else if(statF==='done')list=items.filter(it=>it.a.fuDone);
+  // Sort: not-done before done, then earliest follow-up date first
+  list.sort((A,B)=>{
+    if(!!A.a.fuDone!==!!B.a.fuDone)return A.a.fuDone?1:-1;
+    return(A.a.fuDate||'9999')<(B.a.fuDate||'9999')?-1:1;
+  });
+  const el=document.getElementById('mailTable');
+  if(!list.length){el.innerHTML=`<div class="empty"><div class="empty-ico">📭</div><div>ไม่มีรายการในหมวดนี้</div></div>`;return}
+  el.innerHTML=`<div class="tbl-wrap"><table><thead><tr>
+    <th>ผู้ติดต่อ</th><th>บทบาท</th><th>โครงการ</th><th>ส่งอะไร</th><th>วันที่ส่ง</th><th>ตามวันที่</th><th></th>
+  </tr></thead><tbody>${list.map(({a,c,p})=>{
+    const over=a.fuDate&&!a.fuDone&&isOver(a.fuDate);
+    return`<tr${over?' style="background:#fef2f2"':''}>
+      <td style="font-size:13px;cursor:pointer" onclick="openContDetail('${c.id}')">
+        <div style="font-weight:600;color:var(--navy)">${c.name}</div>
+        <div style="font-size:11px;color:var(--gray)">${c.co||''}</div></td>
+      <td><span class="badge ${ROLE_CLS[c.role]||''}">${ROLE_LBL[c.role]||c.role}</span></td>
+      <td style="font-size:12px;color:var(--gray)">${p?p.name:'—'}</td>
+      <td>${sentBadges(a.sent)}</td>
+      <td style="font-size:12px;white-space:nowrap">${fmtDate(a.date)}</td>
+      <td>${a.fuDate?`<div style="display:flex;align-items:center;gap:6px">
+        <div class="chk ${a.fuDone?'done':''}" onclick="event.stopPropagation();toggleFU('${a.id}',null);renderMail()">${a.fuDone?'✓':''}</div>
+        <span style="font-size:11px;color:${a.fuDone?'var(--green)':over?'var(--red)':'inherit'};white-space:nowrap">
+          ${fmtDate(a.fuDate)}<br>${a.fuDone?'ตามแล้ว ✓':'('+daysText(a.fuDate)+')'}</span>
+      </div>`:'<span style="color:var(--gray);font-size:11px">—</span>'}</td>
+      <td><button class="btn btn-ghost" style="padding:5px 10px;font-size:12px;white-space:nowrap" onclick="openActForCont('${c.id}')">📧 ตามอีก</button></td>
+    </tr>`}).join('')}</tbody></table></div>`;
 }
 
 // ── DASHBOARD ──────────────────────────────────────────────────
