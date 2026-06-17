@@ -132,6 +132,12 @@ tr:last-child td{border-bottom:none}
 /* FORMS */
 .fg{margin-bottom:14px}
 .fr{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.combo-list{position:absolute;z-index:60;left:0;right:0;top:100%;margin-top:4px;background:#fff;border:1px solid #e5e7eb;border-radius:10px;box-shadow:0 10px 28px rgba(0,0,0,.16);max-height:300px;overflow-y:auto}
+.combo-group{position:sticky;top:0;background:#f4f2ee;color:var(--navy);font-weight:700;font-size:11px;padding:7px 12px;border-bottom:1px solid #e8e6e1}
+.combo-item{padding:9px 12px;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:7px;border-bottom:1px solid #f3f4f6}
+.combo-item:last-child{border-bottom:none}
+.combo-item:hover{background:var(--cream)}
+.combo-empty{padding:16px;text-align:center;color:var(--gray);font-size:13px}
 label{display:block;font-size:11px;font-weight:700;color:var(--gd);margin-bottom:5px;text-transform:uppercase;letter-spacing:.3px}
 input,select,textarea{width:100%;padding:9px 11px;border:1px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit;color:var(--text);outline:none;transition:.2s;background:#fff}
 input:focus,select:focus,textarea:focus{border-color:var(--navy);box-shadow:0 0 0 3px rgba(26,43,94,.08)}
@@ -1167,7 +1173,14 @@ textarea{resize:vertical;min-height:75px}
     <div class="modal-body">
       <input type="hidden" id="fActId">
       <div class="fr">
-        <div class="fg"><label>ผู้ติดต่อ *</label><select id="fActCont"><option value="">-- เลือกผู้ติดต่อ --</option></select></div>
+        <div class="fg" style="position:relative"><label>ผู้ติดต่อ *</label>
+          <input type="hidden" id="fActCont">
+          <input type="text" id="fActContSearch" autocomplete="off" placeholder="🔍 พิมพ์ชื่อ / บริษัท / โครงการ..."
+            oninput="document.getElementById('fActCont').value='';filterContPicker()"
+            onfocus="filterContPicker()"
+            onblur="setTimeout(()=>{var l=document.getElementById('fActContList');if(l)l.style.display='none'},150)">
+          <div id="fActContList" class="combo-list" style="display:none"></div>
+        </div>
         <div class="fg"><label>ประเภท</label>
           <select id="fActType">
             <option value="call">📞 โทรศัพท์</option>
@@ -1826,18 +1839,43 @@ function openContDetail(cid){
 }
 
 // ── ACTIVITIES ────────────────────────────────────────────────
-function populateContSel(selId,val){
+// ── SEARCHABLE CONTACT PICKER (type to filter, grouped by project) ──
+function contDisplay(c){return`${c.name}${c.co?' ('+c.co+')':''}`}
+function setContPicker(cid){
+  const x=db();const c=x.contacts.find(q=>q.id===cid);
+  document.getElementById('fActCont').value=c?c.id:'';
+  document.getElementById('fActContSearch').value=c?contDisplay(c):'';
+  const l=document.getElementById('fActContList');if(l)l.style.display='none';
+}
+function filterContPicker(){
   const x=db();
-  const el=document.getElementById(selId);
-  el.innerHTML='<option value="">-- เลือกผู้ติดต่อ --</option>'+x.contacts.map(c=>{
+  const q=(document.getElementById('fActContSearch').value||'').toLowerCase().trim();
+  const list=document.getElementById('fActContList');
+  let cs=x.contacts.filter(c=>{
+    if(!q)return true;
     const p=x.projects.find(pp=>pp.id===c.projId);
-    return`<option value="${c.id}">${c.name}${c.co?' ('+c.co+')':''} — ${p?p.name:'🏢 ระดับบริษัท'}`;
-  }).join('');
-  if(val)el.value=val;
+    return[c.name,c.co,c.pos,c.email,p&&p.name].some(v=>v&&v.toLowerCase().includes(q));
+  });
+  if(!cs.length){list.innerHTML='<div class="combo-empty">ไม่พบผู้ติดต่อ — ลองพิมพ์คำอื่น หรือเพิ่มผู้ติดต่อใหม่ในแท็บ 👥</div>';list.style.display='block';return}
+  // Group by project (company-level contacts grouped together)
+  const groups={};
+  cs.forEach(c=>{
+    const p=x.projects.find(pp=>pp.id===c.projId);
+    const key=p?p.name:'🏢 ระดับบริษัท (ไม่ผูกโครงการ)';
+    (groups[key]=groups[key]||[]).push(c);
+  });
+  list.innerHTML=Object.keys(groups).map(g=>
+    `<div class="combo-group">${g}</div>`+groups[g].map(c=>
+      `<div class="combo-item" onmousedown="event.preventDefault();setContPicker('${c.id}')">
+        <span class="badge ${ROLE_CLS[c.role]||'r-other'}" style="font-size:9px;flex-shrink:0">${ROLE_LBL[c.role]||c.role}</span>
+        <span><b>${c.name}</b>${c.co?' <span style="color:var(--gray);font-size:11px">· '+c.co+'</span>':''}</span>
+      </div>`).join('')
+  ).join('');
+  list.style.display='block';
 }
 
 function openActModal(cid){
-  populateContSel('fActCont',cid||'');
+  setContPicker(cid||'');
   document.getElementById('fActId').value='';
   document.getElementById('fActType').value='call';
   document.getElementById('fActDate').value=today();
