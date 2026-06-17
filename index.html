@@ -1105,7 +1105,7 @@ textarea{resize:vertical;min-height:75px}
     </div>
     <div class="modal-body">
       <input type="hidden" id="fContId">
-      <div class="fg"><label>โครงการที่เกี่ยวข้อง *</label><select id="fContProj"><option value="">-- เลือกโครงการ --</option></select></div>
+      <div class="fg"><label>โครงการที่เกี่ยวข้อง (ถ้ามี)</label><select id="fContProj"><option value="">🏢 ไม่ผูกโครงการ (ระดับบริษัท)</option></select></div>
       <div class="fr">
         <div class="fg"><label>ชื่อ-นามสกุล *</label><input id="fContName" placeholder="เช่น คุณสมชาย ใจดี"></div>
         <div class="fg"><label>ตำแหน่ง</label><input id="fContPos" placeholder="เช่น Project Manager"></div>
@@ -1698,7 +1698,7 @@ function renderProjDetail(pid){
 // ── CONTACTS ──────────────────────────────────────────────────
 function populateProjSel(selId,val){
   const el=document.getElementById(selId);
-  el.innerHTML='<option value="">-- เลือกโครงการ --</option>'+db().projects.map(p=>`<option value="${p.id}">${p.name}</option>`).join('');
+  el.innerHTML='<option value="">🏢 ไม่ผูกโครงการ (ระดับบริษัท)</option>'+db().projects.map(p=>`<option value="${p.id}">${p.name}</option>`).join('');
   if(val)el.value=val;
 }
 
@@ -1726,7 +1726,6 @@ function saveCont(){
   const name=document.getElementById('fContName').value.trim();
   const pid=document.getElementById('fContProj').value;
   if(!name){alert('กรุณากรอกชื่อ');return}
-  if(!pid){alert('กรุณาเลือกโครงการ');return}
   const x=db();const eid=document.getElementById('fContId').value;
   const data={projId:pid,name,pos:document.getElementById('fContPos').value.trim(),co:document.getElementById('fContCo').value.trim(),role:document.getElementById('fContRole').value,phone:document.getElementById('fContPhone').value.trim(),email:document.getElementById('fContEmail').value.trim(),lineId:document.getElementById('fContLine').value.trim(),lineAdded:document.getElementById('fContLineAdded').checked,status:document.getElementById('fContStatus').value,notes:document.getElementById('fContNotes').value.trim(),upd:new Date().toISOString()};
   if(eid){const i=x.contacts.findIndex(c=>c.id===eid);if(i>=0)x.contacts[i]={...x.contacts[i],...data}}
@@ -1832,7 +1831,7 @@ function populateContSel(selId,val){
   const el=document.getElementById(selId);
   el.innerHTML='<option value="">-- เลือกผู้ติดต่อ --</option>'+x.contacts.map(c=>{
     const p=x.projects.find(pp=>pp.id===c.projId);
-    return`<option value="${c.id}">${c.name}${c.co?' ('+c.co+')':''} — ${p?p.name:''}`;
+    return`<option value="${c.id}">${c.name}${c.co?' ('+c.co+')':''} — ${p?p.name:'🏢 ระดับบริษัท'}`;
   }).join('');
   if(val)el.value=val;
 }
@@ -1966,7 +1965,7 @@ function renderMail(){
         <div style="font-weight:600;color:var(--navy)">${c.name}</div>
         <div style="font-size:11px;color:var(--gray)">${c.co||''}</div></td>
       <td><span class="badge ${ROLE_CLS[c.role]||''}">${ROLE_LBL[c.role]||c.role}</span></td>
-      <td style="font-size:12px;color:var(--gray)">${p?p.name:'—'}</td>
+      <td style="font-size:12px;color:var(--gray)">${p?p.name:'🏢 ระดับบริษัท'}</td>
       <td>${sentBadges(a.sent)}</td>
       <td style="font-size:12px;white-space:nowrap">${fmtDate(a.date)}</td>
       <td>${a.fuDate?`<div style="display:flex;align-items:center;gap:6px">
