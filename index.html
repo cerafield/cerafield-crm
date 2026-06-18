@@ -2049,7 +2049,7 @@ function renderDash(){
         <div class="${dcls}">${daysText(a.fuDate)}</div>
         <button class="btn btn-sm" style="margin-top:5px;background:${bcol}" onclick="event.stopPropagation();toggleFU('${a.id}',null)">${_L.done}</button>
       </div>
-    </div>`}).join('')}
+    </div>`}).join('')+(pend.length>allfu.length?`<div onclick="showTab('mail')" style="text-align:center;padding:11px;cursor:pointer;color:var(--navy);font-weight:700;font-size:13px;border-top:1px dashed #e5e7eb">${LANG==='en'?`+ ${pend.length-allfu.length} more pending · View all →`:`+ อีก ${pend.length-allfu.length} รายการที่รอตาม · ดูทั้งหมด →`}</div>`:'')}
 
   const ra=document.getElementById('recentActs');
   const recent=[...x.activities].sort((a,b)=>new Date(b.cre)-new Date(a.cre)).slice(0,8);
