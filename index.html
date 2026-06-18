@@ -2075,6 +2075,27 @@ function renderRpt(){
   const intd=x.contacts.filter(c=>c.status==='interested').length;
   const cont=x.contacts.filter(c=>c.status!=='new').length;
   const pend=x.activities.filter(a=>a.fuDate&&!a.fuDone).length;
+  // Company-level contacts (not linked to any project) — shown in their own section
+  const orphan=x.contacts.filter(c=>!x.projects.some(p=>p.id===c.projId));
+  const orphanSection=orphan.length?`
+    <div class="card" style="margin-bottom:16px">
+      <div class="sec-title" style="margin-bottom:14px">🏢 ${LANG==='en'?'Companies followed (no project)':'บริษัทที่ติดตาม (ไม่ผูกโครงการ)'} (${orphan.length})</div>
+      <div class="tbl-wrap"><table><thead><tr><th>#</th><th>${LANG==='en'?'Name / Position':'ชื่อ / ตำแหน่ง'}</th><th>${LANG==='en'?'Company':'บริษัท'}</th><th>${LANG==='en'?'Role':'บทบาท'}</th><th>${LANG==='en'?'Activities':'กิจกรรม'}</th><th>${u.thFUcol}</th><th>${u.thStatus}</th></tr></thead><tbody>
+      ${orphan.map((c,i)=>{
+        const as=x.activities.filter(a=>a.cid===c.id);
+        const pf=as.filter(a=>a.fuDate&&!a.fuDone);
+        const si=STATUS[c.status]||STATUS.new;
+        return`<tr>
+          <td style="color:var(--gray)">${i+1}</td>
+          <td style="font-weight:700;cursor:pointer;color:var(--navy)" onclick="openContDetail('${c.id}')">${c.name}${c.pos?`<div style="font-size:11px;color:var(--gray);font-weight:400">${c.pos}</div>`:''}</td>
+          <td style="font-size:12px">${c.co||'—'}</td>
+          <td><span class="badge ${ROLE_CLS[c.role]||'r-other'}">${ROLE_LBL[c.role]||c.role}</span></td>
+          <td style="text-align:center">${as.length}</td>
+          <td style="text-align:center">${pf.length?`<span style="color:var(--red);font-weight:700">${pf.length}</span>`:'—'}</td>
+          <td><span class="badge ${si.cls}">${si.lbl}</span></td>
+        </tr>`}).join('')}
+      </tbody></table></div>
+    </div>`:'';
   document.getElementById('rptContent').innerHTML=`
     <div class="stats-grid" style="margin-bottom:20px">
       <div class="stat-card"><div class="stat-num">${x.projects.length}</div><div class="stat-lbl">${u.rptTracked}</div></div>
@@ -2110,6 +2131,7 @@ function renderRpt(){
         </tr>`}).join('')}
       </tbody></table></div>
     </div>
+    ${orphanSection}
     <div style="color:var(--gray);font-size:12px;text-align:center;margin-top:10px">
       CERAFIELD INTERNATIONAL (THAILAND) CO., LTD. · Nantapat Pukchanka, Account Executive · ${fmtDate(today())}
     </div>`;
