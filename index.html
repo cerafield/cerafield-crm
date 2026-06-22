@@ -377,6 +377,11 @@ textarea{resize:vertical;min-height:75px}
         <option value="done">✅ ตามแล้ว</option>
         <option value="all">📋 ทั้งหมด</option>
       </select>
+      <select id="mailSortFilter" onchange="renderMail()" style="width:200px">
+        <option value="fu">↕️ เรียง: วัน Follow-up</option>
+        <option value="recent">🕐 เรียง: แก้ไขล่าสุด</option>
+        <option value="sent">📤 เรียง: วันที่ส่งล่าสุด</option>
+      </select>
     </div>
     <div id="mailTable"></div>
   </div>
@@ -1924,7 +1929,8 @@ function saveAct(){
   if(document.getElementById('fActCatalog').checked)sent.push('catalog');
   if(document.getElementById('fActCP').checked)sent.push('cp');
   if(document.getElementById('fActQuote').checked)sent.push('quote');
-  const data={cid,type:document.getElementById('fActType').value,date:document.getElementById('fActDate').value,notes,next:document.getElementById('fActNext').value.trim(),fuDate:document.getElementById('fActFU').value||null,fuDone:false,sent,cre:new Date().toISOString()};
+  const now=new Date().toISOString();
+  const data={cid,type:document.getElementById('fActType').value,date:document.getElementById('fActDate').value,notes,next:document.getElementById('fActNext').value.trim(),fuDate:document.getElementById('fActFU').value||null,fuDone:false,sent,cre:now,upd:now};
   x.activities.push({id:uid(),...data});
   let ns=document.getElementById('fActStatus').value;
   // Auto-bump status when docs were sent (only if user didn't pick one and contact isn't already further along)
@@ -1967,7 +1973,7 @@ function renderActs(){
 
 function toggleFU(aid,pid){
   const x=db();const a=x.activities.find(q=>q.id===aid);
-  if(a){a.fuDone=!a.fuDone;save(x);toast(a.fuDone?'✅ ตามแล้ว!':'↩️ ยกเลิก')}
+  if(a){a.fuDone=!a.fuDone;a.upd=new Date().toISOString();save(x);toast(a.fuDone?'✅ ตามแล้ว!':'↩️ ยกเลิก')}
   if(pid)renderProjDetail(pid);
   renderDash();
 }
@@ -2010,11 +2016,21 @@ function renderMail(){
   else if(statF==='today')list=items.filter(it=>it.a.fuDate===t&&!it.a.fuDone);
   else if(statF==='pending')list=items.filter(it=>it.a.fuDate&&!it.a.fuDone);
   else if(statF==='done')list=items.filter(it=>it.a.fuDone);
-  // Sort: not-done before done, then earliest follow-up date first
-  list.sort((A,B)=>{
-    if(!!A.a.fuDone!==!!B.a.fuDone)return A.a.fuDone?1:-1;
-    return(A.a.fuDate||'9999')<(B.a.fuDate||'9999')?-1:1;
-  });
+  // Sort
+  const sortF=document.getElementById('mailSortFilter')?.value||'fu';
+  if(sortF==='recent'){
+    // Most recently added/modified first (upd falls back to cre)
+    list.sort((A,B)=>new Date(B.a.upd||B.a.cre||0)-new Date(A.a.upd||A.a.cre||0));
+  }else if(sortF==='sent'){
+    // Latest activity (send) date first
+    list.sort((A,B)=>(B.a.date||'')<(A.a.date||'')?-1:(B.a.date||'')>(A.a.date||'')?1:0);
+  }else{
+    // Default: not-done before done, then earliest follow-up date first
+    list.sort((A,B)=>{
+      if(!!A.a.fuDone!==!!B.a.fuDone)return A.a.fuDone?1:-1;
+      return(A.a.fuDate||'9999')<(B.a.fuDate||'9999')?-1:1;
+    });
+  }
   const el=document.getElementById('mailTable');
   if(!list.length){el.innerHTML=`<div class="empty"><div class="empty-ico">📭</div><div>ไม่มีรายการในหมวดนี้</div></div>`;return}
   el.innerHTML=`<div class="tbl-wrap"><table><thead><tr>
