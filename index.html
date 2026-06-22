@@ -1117,7 +1117,9 @@ textarea{resize:vertical;min-height:75px}
         <div class="fg"><label>ตำแหน่ง</label><input id="fContPos" placeholder="เช่น Project Manager"></div>
       </div>
       <div class="fr">
-        <div class="fg"><label>บริษัท</label><input id="fContCo" placeholder="ชื่อบริษัท / สำนักงาน"></div>
+        <div class="fg"><label>บริษัท</label><input id="fContCo" placeholder="ชื่อบริษัท / สำนักงาน" oninput="checkDupCo()" autocomplete="off">
+          <div id="fContCoWarn" style="display:none;margin-top:5px;font-size:11.5px;color:#b91c1c;background:#fef2f2;border:1px solid #fecaca;border-radius:7px;padding:6px 9px;line-height:1.5"></div>
+        </div>
         <div class="fg"><label>บทบาทในโครงการ</label>
           <select id="fContRole">
             <option value="owner">เจ้าของโครงการ</option>
@@ -1730,7 +1732,28 @@ function openContModal(id){
   document.getElementById('fContStatus').value=d?d.status||'new':'new';
   document.getElementById('fContNotes').value=d?d.notes||'':'';
   document.getElementById('mContTitle').textContent=d?'แก้ไขผู้ติดต่อ':'เพิ่มผู้ติดต่อ';
+  checkDupCo();
   openM('mCont');
+}
+
+// Warn (red) when the typed company name already exists — helps avoid emailing the same company twice
+function checkDupCo(){
+  const el=document.getElementById('fContCoWarn');if(!el)return;
+  const co=(document.getElementById('fContCo').value||'').trim().toLowerCase();
+  const eid=document.getElementById('fContId').value;
+  if(!co){el.style.display='none';return}
+  const x=db();
+  const dups=x.contacts.filter(c=>c.id!==eid&&(c.co||'').trim().toLowerCase()===co);
+  if(!dups.length){el.style.display='none';return}
+  const names=dups.map(c=>c.name).slice(0,3).join(', ')+(dups.length>3?` +${dups.length-3}`:'');
+  let msg=`⚠️ มีบริษัทนี้อยู่แล้ว ${dups.length} รายชื่อ: <b>${names}</b>`;
+  const dupIds=dups.map(c=>c.id);
+  const sent=x.activities.filter(a=>dupIds.includes(a.cid)&&((a.sent&&a.sent.length)||a.type==='email'));
+  if(sent.length){
+    const last=sent.sort((a,b)=>new Date(b.date)-new Date(a.date))[0];
+    msg+=`<br>📧 เคยส่งอีเมล/เอกสารให้บริษัทนี้แล้ว (ล่าสุด ${fmtDate(last.date)}) — เช็กก่อนส่งซ้ำ`;
+  }
+  el.innerHTML=msg;el.style.display='block';
 }
 
 function openContModalForProj(pid){openContModal();document.getElementById('fContProj').value=pid}
