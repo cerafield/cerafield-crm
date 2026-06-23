@@ -334,7 +334,22 @@ textarea{resize:vertical;min-height:75px}
     <button class="btn btn-primary" onclick="openContModal()"><span id="lblBtnAddCont">+ เพิ่มผู้ติดต่อ</span></button>
   </div>
   <div class="card">
-    <input id="contSearch" placeholder="ค้นหา ชื่อ, บริษัท, โครงการ..." style="margin-bottom:14px" oninput="renderConts()">
+    <div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap">
+      <input id="contSearch" placeholder="ค้นหา ชื่อ, บริษัท, โครงการ..." style="flex:1;min-width:220px;margin:0" oninput="renderConts()">
+      <select id="contRoleFilter" onchange="renderConts()" style="width:190px">
+        <option value="">👤 ทุกบทบาท</option>
+        <option value="owner">เจ้าของโครงการ</option>
+        <option value="architect">สถาปนิก</option>
+        <option value="interior">ออกแบบภายใน</option>
+        <option value="contractor">ผู้รับเหมา (GC)</option>
+        <option value="mep">MEP</option>
+        <option value="qs">QS</option>
+        <option value="pm">PM</option>
+        <option value="proc">จัดซื้อ</option>
+        <option value="retail">🛍️ ลูกค้าปลีก</option>
+        <option value="other">อื่นๆ</option>
+      </select>
+    </div>
     <div id="contTable"></div>
   </div>
 </div>
@@ -1794,8 +1809,10 @@ function delCont(id){
 function renderConts(){
   const x=db();const _L=LANG==='en'?_EN:_TH;const u=_L.ui;
   const q=(document.getElementById('contSearch')?.value||'').toLowerCase();
+  const roleF=document.getElementById('contRoleFilter')?.value||'';
   const el=document.getElementById('contTable');
   let cs=x.contacts;
+  if(roleF)cs=cs.filter(c=>c.role===roleF);
   if(q)cs=cs.filter(c=>{const p=x.projects.find(pp=>pp.id===c.projId);return[c.name,c.co,c.pos,c.email,p?.name].some(v=>v&&v.toLowerCase().includes(q))});
   if(!cs.length){el.innerHTML=`<div class="empty"><div class="empty-ico">👥</div><div>${u.noCont}</div></div>`;return}
   el.innerHTML=`<div class="tbl-wrap"><table><thead><tr><th>${u.thName}</th><th>${u.thCo}</th><th>${u.thProj}</th><th>${u.thContact}</th><th>${u.thStatus}</th><th>${u.thLast}</th><th></th></tr></thead><tbody>${cs.map(c=>{
