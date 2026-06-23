@@ -95,6 +95,7 @@ tr:last-child td{border-bottom:none}
 .r-proc{background:#fff7ed;color:#9a3412}
 .r-mep{background:#f0f9ff;color:#0369a1}
 .r-other{background:#f3f4f6;color:#374151}
+.r-retail{background:#fff1f2;color:#be123c}
 .s-design{background:#eff6ff;color:#1d4ed8}
 .s-construction{background:#fef3c7;color:#92400e}
 .s-procurement{background:#d1fae5;color:#065f46}
@@ -368,6 +369,7 @@ textarea{resize:vertical;min-height:75px}
         <option value="qs">QS</option>
         <option value="pm">PM</option>
         <option value="proc">จัดซื้อ</option>
+        <option value="retail">🛍️ ลูกค้าปลีก</option>
         <option value="other">อื่นๆ</option>
       </select>
       <select id="mailStatFilter" onchange="renderMail()" style="width:170px">
@@ -1125,7 +1127,7 @@ textarea{resize:vertical;min-height:75px}
         <div class="fg"><label>บริษัท</label><input id="fContCo" placeholder="ชื่อบริษัท / สำนักงาน" oninput="checkDupCo()" autocomplete="off">
           <div id="fContCoWarn" style="display:none;margin-top:5px;font-size:11.5px;color:#b91c1c;background:#fef2f2;border:1px solid #fecaca;border-radius:7px;padding:6px 9px;line-height:1.5"></div>
         </div>
-        <div class="fg"><label>บทบาทในโครงการ</label>
+        <div class="fg"><label>บทบาท / ประเภท</label>
           <select id="fContRole">
             <option value="owner">เจ้าของโครงการ</option>
             <option value="architect" selected>สถาปนิก</option>
@@ -1135,6 +1137,7 @@ textarea{resize:vertical;min-height:75px}
             <option value="qs">QS / Cost Control</option>
             <option value="pm">PM / Site Manager</option>
             <option value="proc">ฝ่ายจัดซื้อ</option>
+            <option value="retail">🛍️ ลูกค้าปลีก / รายบุคคล</option>
             <option value="other">อื่นๆ</option>
           </select>
         </div>
@@ -1161,6 +1164,7 @@ textarea{resize:vertical;min-height:75px}
           <option value="not_interested">❌ ไม่สนใจ / ล็อคสเปกแล้ว</option>
         </select>
       </div>
+      <div class="fg"><label>พบที่ไหน / แหล่งที่มา</label><input id="fContSource" placeholder="เช่น งานสถาปนิก'68 เมืองทอง, แนะนำโดย…, เดินเข้าโชว์รูม"></div>
       <div class="fg"><label>หมายเหตุ</label><textarea id="fContNotes" placeholder="ข้อมูลที่ควรจำ เช่น ดูแลแค่ส่วนกลาง, ให้ต่อคนอื่น, ต้องรอ spec confirm"></textarea></div>
     </div>
     <div class="modal-footer">
@@ -1349,7 +1353,7 @@ const _TH={
   nav:['🏠 ภาพรวม','🏗️ โครงการ','👥 ผู้ติดต่อ','📋 กิจกรรม','📧 อีเมล / ตามงาน','📊 รายงาน','📦 โลจิสติกส์'],
   type:{hotel:'โรงแรม',condo:'คอนโด',hospital:'โรงพยาบาล',office:'สำนักงาน',retail:'ศูนย์การค้า',residential:'บ้าน',government:'ราชการ',other:'อื่นๆ'},
   stage:{design:'🎨 ออกแบบ',construction:'🏗️ ก่อสร้าง',procurement:'🛒 จัดซื้อ',completed:'✅ เสร็จแล้ว'},
-  role:{owner:'เจ้าของโครงการ',architect:'สถาปนิก',interior:'ออกแบบภายใน',contractor:'ผู้รับเหมา (GC)',mep:'MEP',qs:'QS',pm:'PM',proc:'จัดซื้อ',other:'อื่นๆ'},
+  role:{owner:'เจ้าของโครงการ',architect:'สถาปนิก',interior:'ออกแบบภายใน',contractor:'ผู้รับเหมา (GC)',mep:'MEP',qs:'QS',pm:'PM',proc:'จัดซื้อ',retail:'🛍️ ลูกค้าปลีก',other:'อื่นๆ'},
   act:{call:'📞 โทร',email:'📧 อีเมล',line:'💬 LINE',meeting:'🤝 พบ',other:'•'},
   status:{new:'🆕 ใหม่',contacted:'📞 ติดต่อแล้ว',catalog_sent:'📄 ส่ง Catalog',email_sent:'📧 ส่งอีเมล',line_sent:'💬 ส่ง LINE',followup:'🔔 รอตาม',interested:'✅ สนใจ',not_interested:'❌ ไม่สนใจ'},
   stat:['โครงการ','ผู้ติดต่อ','เลย Follow up','ต้องตามวันนี้'],
@@ -1380,7 +1384,7 @@ const _EN={
   nav:['🏠 Overview','🏗️ Projects','👥 Contacts','📋 Activities','📧 Email / Follow-up','📊 Report','📦 Logistics'],
   type:{hotel:'Hotel',condo:'Condo',hospital:'Hospital',office:'Office',retail:'Retail/Mall',residential:'Housing',government:'Government',other:'Other'},
   stage:{design:'🎨 Design',construction:'🏗️ Construction',procurement:'🛒 Procurement',completed:'✅ Completed'},
-  role:{owner:'Owner',architect:'Architect',interior:'Interior Design',contractor:'Contractor (GC)',mep:'MEP',qs:'QS',pm:'PM',proc:'Procurement',other:'Other'},
+  role:{owner:'Owner',architect:'Architect',interior:'Interior Design',contractor:'Contractor (GC)',mep:'MEP',qs:'QS',pm:'PM',proc:'Procurement',retail:'🛍️ Retail / Individual',other:'Other'},
   act:{call:'📞 Call',email:'📧 Email',line:'💬 LINE',meeting:'🤝 Meeting',other:'•'},
   status:{new:'🆕 New',contacted:'📞 Contacted',catalog_sent:'📄 Catalog Sent',email_sent:'📧 Email Sent',line_sent:'💬 LINE Sent',followup:'🔔 Follow up',interested:'✅ Interested',not_interested:'❌ Not Interested'},
   stat:['Projects','Contacts','Overdue','Due Today'],
@@ -1413,7 +1417,7 @@ const TYPE_LBL={..._TH.type};
 const STAGE_LBL={..._TH.stage};
 const STAGE_CLS={design:'s-design',construction:'s-construction',procurement:'s-procurement',completed:'s-completed'};
 const ROLE_LBL={..._TH.role};
-const ROLE_CLS={owner:'r-owner',architect:'r-architect',interior:'r-interior',contractor:'r-contractor',mep:'r-mep',qs:'r-qs',pm:'r-pm',proc:'r-proc',other:'r-other'};
+const ROLE_CLS={owner:'r-owner',architect:'r-architect',interior:'r-interior',contractor:'r-contractor',mep:'r-mep',qs:'r-qs',pm:'r-pm',proc:'r-proc',retail:'r-retail',other:'r-other'};
 const ACT_LBL={..._TH.act};
 const ACT_CLS={call:'a-call',email:'a-email',line:'a-line',meeting:'a-meeting',other:'b-new'};
 
@@ -1735,6 +1739,7 @@ function openContModal(id){
   document.getElementById('fContLine').value=d?d.lineId||'':'';
   document.getElementById('fContLineAdded').checked=d?d.lineAdded||false:false;
   document.getElementById('fContStatus').value=d?d.status||'new':'new';
+  document.getElementById('fContSource').value=d?d.source||'':'';
   document.getElementById('fContNotes').value=d?d.notes||'':'';
   document.getElementById('mContTitle').textContent=d?'แก้ไขผู้ติดต่อ':'เพิ่มผู้ติดต่อ';
   checkDupCo();
@@ -1768,7 +1773,7 @@ function saveCont(){
   const pid=document.getElementById('fContProj').value;
   if(!name){alert('กรุณากรอกชื่อ');return}
   const x=db();const eid=document.getElementById('fContId').value;
-  const data={projId:pid,name,pos:document.getElementById('fContPos').value.trim(),co:document.getElementById('fContCo').value.trim(),role:document.getElementById('fContRole').value,phone:document.getElementById('fContPhone').value.trim(),email:document.getElementById('fContEmail').value.trim(),lineId:document.getElementById('fContLine').value.trim(),lineAdded:document.getElementById('fContLineAdded').checked,status:document.getElementById('fContStatus').value,notes:document.getElementById('fContNotes').value.trim(),upd:new Date().toISOString()};
+  const data={projId:pid,name,pos:document.getElementById('fContPos').value.trim(),co:document.getElementById('fContCo').value.trim(),role:document.getElementById('fContRole').value,phone:document.getElementById('fContPhone').value.trim(),email:document.getElementById('fContEmail').value.trim(),lineId:document.getElementById('fContLine').value.trim(),lineAdded:document.getElementById('fContLineAdded').checked,status:document.getElementById('fContStatus').value,source:document.getElementById('fContSource').value.trim(),notes:document.getElementById('fContNotes').value.trim(),upd:new Date().toISOString()};
   if(eid){const i=x.contacts.findIndex(c=>c.id===eid);if(i>=0)x.contacts[i]={...x.contacts[i],...data}}
   else x.contacts.push({id:uid(),cre:new Date().toISOString(),...data});
   save(x);closeM('mCont');toast('✅ บันทึกผู้ติดต่อแล้ว');
@@ -1836,6 +1841,7 @@ function openContDetail(cid){
       ${c.email?`<div>📧 <a href="mailto:${c.email}" style="color:var(--navy)">${c.email}</a></div>`:''}
       ${c.lineId?`<div>💬 LINE: ${c.lineId}</div>`:''}
       ${p?`<div>🏗️ ${p.name}</div>`:''}
+      ${c.source?`<div>🛍️ พบที่: ${c.source}</div>`:''}
     </div>
     ${c.notes?`<div style="background:var(--cream);padding:11px;border-radius:8px;font-size:13px;margin-bottom:14px;color:var(--gd)">${c.notes}</div>`:''}
     <div class="div"></div>
@@ -2118,7 +2124,7 @@ function renderRpt(){
   const orphan=x.contacts.filter(c=>!x.projects.some(p=>p.id===c.projId));
   const orphanSection=orphan.length?`
     <div class="card" style="margin-bottom:16px">
-      <div class="sec-title" style="margin-bottom:14px">🏢 ${LANG==='en'?'Companies followed (no project)':'บริษัทที่ติดตาม (ไม่ผูกโครงการ)'} (${orphan.length})</div>
+      <div class="sec-title" style="margin-bottom:14px">🏢 ${LANG==='en'?'Companies / leads followed (no project)':'บริษัท / ลูกค้าที่ติดตาม (ไม่ผูกโครงการ)'} (${orphan.length})</div>
       <div class="tbl-wrap"><table><thead><tr><th>#</th><th>${LANG==='en'?'Name / Position':'ชื่อ / ตำแหน่ง'}</th><th>${LANG==='en'?'Company':'บริษัท'}</th><th>${LANG==='en'?'Role':'บทบาท'}</th><th>${LANG==='en'?'Activities':'กิจกรรม'}</th><th>${u.thFUcol}</th><th>${u.thStatus}</th></tr></thead><tbody>
       ${orphan.map((c,i)=>{
         const as=x.activities.filter(a=>a.cid===c.id);
