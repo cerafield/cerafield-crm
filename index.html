@@ -271,6 +271,7 @@ textarea{resize:vertical;min-height:75px}
   <div class="nav-tab" onclick="showTab('cont')">👥 ผู้ติดต่อ</div>
   <div class="nav-tab" onclick="showTab('act')">📋 กิจกรรม</div>
   <div class="nav-tab" onclick="showTab('mail')">📧 อีเมล / ตามงาน</div>
+  <div class="nav-tab" onclick="showTab('tpl')">📨 ต้นแบบข้อความ</div>
   <div class="nav-tab" onclick="showTab('rpt')">📊 รายงาน</div>
   <div class="nav-tab" onclick="showTab('logi')">📦 โลจิสติกส์</div>
 </div>
@@ -401,6 +402,42 @@ textarea{resize:vertical;min-height:75px}
       </select>
     </div>
     <div id="mailTable"></div>
+  </div>
+</div>
+
+<!-- ===== TEMPLATES ===== -->
+<div id="panel-tpl" class="panel">
+  <div class="sec-hdr">
+    <div class="sec-title">📨 ต้นแบบข้อความ</div>
+  </div>
+  <div class="card" style="margin-bottom:16px">
+    <div style="font-size:12px;color:var(--gray);margin-bottom:8px">👤 ผู้รับ — พิมพ์เองหรือเลือกจากผู้ติดต่อ แล้วระบบเติมชื่อในข้อความให้อัตโนมัติ</div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <div style="flex:1;min-width:220px;position:relative">
+        <input id="tplName" placeholder="ชื่อผู้รับ เช่น คุณเอส" autocomplete="off" oninput="tplFilterContacts();renderTpl()" onfocus="tplFilterContacts()" onblur="setTimeout(()=>{var l=document.getElementById('tplContactList');if(l)l.style.display='none'},150)" style="margin:0;width:100%">
+        <div id="tplContactList" class="combo-list" style="display:none"></div>
+      </div>
+      <input id="tplCo" placeholder="บริษัท (ถ้ามี)" autocomplete="off" oninput="renderTpl()" style="flex:1;min-width:180px;margin:0">
+      <input type="hidden" id="tplEmail">
+    </div>
+  </div>
+  <div class="card">
+    <div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap">
+      <select id="tplChannelFilter" onchange="renderTpl()" style="width:170px">
+        <option value="">📡 ทุกช่องทาง</option>
+        <option value="email">✉️ อีเมล</option>
+        <option value="ig">📷 Instagram</option>
+        <option value="tiktok">🎵 TikTok</option>
+        <option value="line">💬 LINE</option>
+      </select>
+      <select id="tplGroupFilter" onchange="renderTpl()" style="width:200px">
+        <option value="">👥 ทุกกลุ่ม</option>
+        <option value="project">🏗️ โครงการ / สถาปนิก</option>
+        <option value="retail">🛍️ ลูกค้าปลีก</option>
+        <option value="general">🌐 ทั่วไป</option>
+      </select>
+    </div>
+    <div id="tplList"></div>
   </div>
 </div>
 
@@ -1356,6 +1393,7 @@ function setupFirebase(){
       else if(tid==='cont')renderConts();
       else if(tid==='act')renderActs();
       else if(tid==='mail')renderMail();
+      else if(tid==='tpl')renderTpl();
       else if(tid==='rpt')renderRpt();
     }
   });
@@ -1365,7 +1403,7 @@ function uid(){return Date.now().toString(36)+Math.random().toString(36).substr(
 // ── LANGUAGE ──────────────────────────────────────────────────
 let LANG=localStorage.getItem('cera_lang')||'th';
 const _TH={
-  nav:['🏠 ภาพรวม','🏗️ โครงการ','👥 ผู้ติดต่อ','📋 กิจกรรม','📧 อีเมล / ตามงาน','📊 รายงาน','📦 โลจิสติกส์'],
+  nav:['🏠 ภาพรวม','🏗️ โครงการ','👥 ผู้ติดต่อ','📋 กิจกรรม','📧 อีเมล / ตามงาน','📨 ต้นแบบข้อความ','📊 รายงาน','📦 โลจิสติกส์'],
   type:{hotel:'โรงแรม',condo:'คอนโด',hospital:'โรงพยาบาล',office:'สำนักงาน',retail:'ศูนย์การค้า',residential:'บ้าน',government:'ราชการ',other:'อื่นๆ'},
   stage:{design:'🎨 ออกแบบ',construction:'🏗️ ก่อสร้าง',procurement:'🛒 จัดซื้อ',completed:'✅ เสร็จแล้ว'},
   role:{owner:'เจ้าของโครงการ',architect:'สถาปนิก',interior:'ออกแบบภายใน',contractor:'ผู้รับเหมา (GC)',mep:'MEP',qs:'QS',pm:'PM',proc:'จัดซื้อ',retail:'🛍️ ลูกค้าปลีก',other:'อื่นๆ'},
@@ -1396,7 +1434,7 @@ const _TH={
   }
 };
 const _EN={
-  nav:['🏠 Overview','🏗️ Projects','👥 Contacts','📋 Activities','📧 Email / Follow-up','📊 Report','📦 Logistics'],
+  nav:['🏠 Overview','🏗️ Projects','👥 Contacts','📋 Activities','📧 Email / Follow-up','📨 Templates','📊 Report','📦 Logistics'],
   type:{hotel:'Hotel',condo:'Condo',hospital:'Hospital',office:'Office',retail:'Retail/Mall',residential:'Housing',government:'Government',other:'Other'},
   stage:{design:'🎨 Design',construction:'🏗️ Construction',procurement:'🛒 Procurement',completed:'✅ Completed'},
   role:{owner:'Owner',architect:'Architect',interior:'Interior Design',contractor:'Contractor (GC)',mep:'MEP',qs:'QS',pm:'PM',proc:'Procurement',retail:'🛍️ Retail / Individual',other:'Other'},
@@ -1482,6 +1520,7 @@ function applyLang(lang){
   else if(tid==='cont')renderConts();
   else if(tid==='act')renderActs();
   else if(tid==='mail')renderMail();
+  else if(tid==='tpl')renderTpl();
   else if(tid==='rpt')renderRpt();
 }
 function toggleLang(){applyLang(LANG==='th'?'en':'th')}
@@ -1490,7 +1529,7 @@ function toggleLang(){applyLang(LANG==='th'?'en':'th')}
 function showTab(name){
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
-  const idx={dash:0,proj:1,cont:2,act:3,mail:4,rpt:5,logi:6};
+  const idx={dash:0,proj:1,cont:2,act:3,mail:4,tpl:5,rpt:6,logi:7};
   document.getElementById('panel-'+name).classList.add('active');
   document.querySelectorAll('.nav-tab')[idx[name]].classList.add('active');
   if(name==='dash')renderDash();
@@ -1498,6 +1537,7 @@ function showTab(name){
   if(name==='cont')renderConts();
   if(name==='act')renderActs();
   if(name==='mail')renderMail();
+  if(name==='tpl')renderTpl();
   if(name==='rpt')renderRpt();
 }
 
@@ -2197,6 +2237,323 @@ function renderRpt(){
     <div style="color:var(--gray);font-size:12px;text-align:center;margin-top:10px">
       CERAFIELD INTERNATIONAL (THAILAND) CO., LTD. · Nantapat Pukchanka, Account Executive · ${fmtDate(today())}
     </div>`;
+}
+
+// ── MESSAGE TEMPLATES ──────────────────────────────────────────
+const SIG_TH=`ขอแสดงความนับถือ
+นันทพัทธ์ พุกชาญค้า (โทนี่)
+Account Executive | CERAFIELD THAILAND
+Mobile: 064-598-2632  ·  Email: tony.p@cerafield.com  ·  LINE ID: im454`;
+const SIG_EN=`Best regards,
+Nantapat Pukchanka (Tony)
+Account Executive | CERAFIELD THAILAND
+Mobile: +66 64-598-2632  ·  Email: tony.p@cerafield.com  ·  LINE ID: im454`;
+
+const TEMPLATES=[
+{id:'em_proj_intro',channel:'email',group:'project',title:'แนะนำบริษัท (ครั้งแรก)',
+ subject:'CERAFIELD THAILAND – แนะนำผลิตภัณฑ์สุขภัณฑ์สำหรับงานโครงการ',
+ th:`เรียน {ชื่อ}
+
+ผม นันทพัทธ์ พุกชาญค้า (โทนี่) ตำแหน่ง Account Executive จาก CERAFIELD THAILAND ครับ
+ขออนุญาตแนะนำบริษัทและผลิตภัณฑ์ของทางเรา เพื่อใช้ประกอบการพิจารณาสำหรับงานโครงการในอนาคตครับ
+
+CERAFIELD THAILAND มุ่งเน้นการนำเสนอ Sanitaryware Solutions สำหรับงาน Residential, Hospitality และ Commercial Projects โดยให้ความสำคัญทั้งด้าน Design, Functionality และมาตรฐานสำหรับงานโครงการ
+
+ทีมงานของเรายินดีสนับสนุนในส่วนของ
+• Product Recommendation ให้เหมาะกับ Concept ของโครงการ
+• Product Information & Specification Support
+• Technical Product Consultation
+• Coordination สำหรับงาน Project ตามความเหมาะสม
+
+เอกสารที่แนบมาในอีเมลนี้
+• Company Profile
+• Product Catalog
+
+หากในอนาคตทางทีมงานมีโครงการที่ต้องการข้อมูลเพิ่มเติม หรือมีโอกาสให้ทางเราเข้าไปนำเสนอผลิตภัณฑ์ ผมและทีมงานยินดีสนับสนุนอย่างเต็มที่ครับ ทั้งนี้ ขออนุญาตติดตามผลอีกครั้งในโอกาสถัดไปครับ
+
+`+SIG_TH,
+ en:`Dear {ชื่อ},
+
+My name is Nantapat Pukchanka (Tony), Account Executive at CERAFIELD THAILAND. I would like to introduce our company and products for your consideration on upcoming projects.
+
+CERAFIELD THAILAND focuses on Sanitaryware Solutions for Residential, Hospitality and Commercial Projects, with attention to Design, Functionality and project-grade standards.
+
+Our team is glad to support you with:
+• Product Recommendation suited to your project concept
+• Product Information & Specification Support
+• Technical Product Consultation
+• Project Coordination as appropriate
+
+Attached to this email:
+• Company Profile
+• Product Catalog
+
+Should your team have a project requiring further information, or an opportunity for us to present our products, we would be delighted to support you. I will follow up again at a suitable time.
+
+`+SIG_EN},
+
+{id:'em_proj_fu1',channel:'email',group:'project',title:'Follow-up ครั้งที่ 1 – ส่ง Catalog อัปเดต',
+ subject:'CERAFIELD THAILAND – ส่ง Product Catalog ฉบับอัปเดตล่าสุด',
+ th:`เรียน {ชื่อ}
+
+สืบเนื่องจากอีเมลที่ผมเคยส่งแนะนำบริษัทและผลิตภัณฑ์ของ CERAFIELD THAILAND ก่อนหน้านี้ ผมขออนุญาตติดต่ออีกครั้ง พร้อมส่ง Product Catalog ฉบับอัปเดตล่าสุด เพื่อใช้ประกอบการพิจารณาสำหรับโครงการในปัจจุบันและอนาคตครับ
+
+Catalog ฉบับล่าสุดมีการอัปเดตข้อมูลผลิตภัณฑ์และเพิ่มเติมสุขภัณฑ์บางรุ่น เพื่อให้ข้อมูลครบถ้วนและเป็นปัจจุบันมากขึ้น สำหรับงานประเภท Residential, Hospitality และ Commercial Projects
+
+ทีมงานของเราพร้อมสนับสนุนด้าน
+• Product Recommendation ให้เหมาะกับประเภทและ Positioning ของโครงการ
+• Product Information & Specification Support
+• Technical Product Consultation
+• Coordination สำหรับงาน Project ตามความเหมาะสม
+
+ทั้งนี้ หากมีผู้ประสานงานหรือทีมงานที่ดูแลการพิจารณาสุขภัณฑ์โดยตรง รบกวนช่วยแนะนำเพิ่มเติม เพื่อให้ทางเราส่งข้อมูลไปยังผู้รับผิดชอบได้อย่างเหมาะสมครับ
+
+ขอบพระคุณสำหรับเวลาและการพิจารณา และหวังว่าจะมีโอกาสได้สนับสนุนโครงการของทางทีมงานในอนาคตครับ
+
+`+SIG_TH,
+ en:`Dear {ชื่อ},
+
+Following my previous email introducing CERAFIELD THAILAND, I would like to reach out again and share our latest updated Product Catalog for your consideration on current and future projects.
+
+The latest catalog includes updated product information and several newly added models, providing more complete and current data for Residential, Hospitality and Commercial Projects.
+
+Our team is ready to support you with product recommendations, specifications, technical consultation and project coordination.
+
+If there is a colleague who handles sanitaryware selection directly, I would be grateful if you could kindly refer me, so I can send the information to the right person.
+
+Thank you for your time and consideration.
+
+`+SIG_EN},
+
+{id:'em_proj_fu2',channel:'email',group:'project',title:'Follow-up ครั้งที่ 2 – สอบถามความคืบหน้า',
+ subject:'ติดตามข้อมูลผลิตภัณฑ์ CERAFIELD THAILAND',
+ th:`เรียน {ชื่อ}
+
+ผมขออนุญาตติดตามอีกครั้งนะครับ เกี่ยวกับข้อมูลผลิตภัณฑ์และ Catalog ของ CERAFIELD THAILAND ที่ได้เรียนส่งไปก่อนหน้านี้
+
+ไม่ทราบว่าทางทีมงานมีโครงการที่อยู่ระหว่างพิจารณาเลือกสุขภัณฑ์ หรือมีส่วนใดที่ต้องการให้ผมสนับสนุนข้อมูลเพิ่มเติมไหมครับ ผมยินดีจัดส่งรายละเอียด สเปก หรือเข้าไปนำเสนอตามความสะดวกของทางทีมงานครับ
+
+ขอบพระคุณมากครับ
+
+`+SIG_TH,
+ en:`Dear {ชื่อ},
+
+I am writing to gently follow up regarding the CERAFIELD THAILAND product information and catalog I shared earlier.
+
+Is there currently a project under sanitaryware consideration, or any way I can support your team with further details? I would be glad to provide specifications or arrange a presentation at your convenience.
+
+Thank you very much.
+
+`+SIG_EN},
+
+{id:'em_proj_fu3',channel:'email',group:'project',title:'Follow-up ครั้งที่ 3 – ขอช่องทางผู้รับผิดชอบ',
+ subject:'ขอช่องทางผู้ประสานงานด้านสุขภัณฑ์ – CERAFIELD THAILAND',
+ th:`เรียน {ชื่อ}
+
+ผมขออนุญาตรบกวนเป็นครั้งสุดท้ายนะครับ หากช่วงนี้ยังไม่มีโครงการที่เกี่ยวข้อง ผมเข้าใจดีและขอบพระคุณสำหรับเวลาที่ผ่านมาครับ
+
+ทั้งนี้ หากสะดวก รบกวนขอช่องทางของผู้ที่ดูแลการพิจารณาสุขภัณฑ์/วัสดุห้องน้ำของทางทีมงานโดยตรง เพื่อให้ผมส่งข้อมูลไปยังผู้รับผิดชอบได้อย่างเหมาะสม และไม่เป็นการรบกวนท่านเพิ่มเติมครับ
+
+ขอบพระคุณอย่างสูงครับ
+
+`+SIG_TH,
+ en:`Dear {ชื่อ},
+
+I would like to follow up one final time. If there is no relevant project at the moment, I completely understand and thank you for your time.
+
+If possible, could you kindly share the contact of the person who handles sanitaryware/bathroom material selection for your team, so I can direct the information appropriately and avoid troubling you further?
+
+Thank you very much.
+
+`+SIG_EN},
+
+{id:'em_proj_meeting',channel:'email',group:'project',title:'ขอนัดเข้าพบ / นำเสนอผลิตภัณฑ์',
+ subject:'ขอนัดเข้าพบเพื่อนำเสนอผลิตภัณฑ์ CERAFIELD THAILAND',
+ th:`เรียน {ชื่อ}
+
+เนื่องด้วย CERAFIELD THAILAND มีผลิตภัณฑ์สุขภัณฑ์รุ่นใหม่สำหรับงานโครงการ ผมขออนุญาตขอเข้าพบทางทีมงาน เพื่อนำเสนอผลิตภัณฑ์ ตัวอย่างสินค้า และแนวทางการสนับสนุนงานโครงการอย่างละเอียดครับ
+
+รบกวนสอบถามว่าทางทีมงานสะดวกให้เข้าพบช่วงใดครับ ผมยินดีปรับตามวันและเวลาที่ทางทีมงานสะดวก ทั้งแบบเข้าพบที่ออฟฟิศหรือผ่านช่องทางออนไลน์ครับ
+
+ขอบพระคุณสำหรับโอกาสครับ
+
+`+SIG_TH,
+ en:`Dear {ชื่อ},
+
+As CERAFIELD THAILAND has new sanitaryware products for projects, I would like to request a meeting with your team to present our products, samples and project support in detail.
+
+May I ask when would be convenient for your team? I am happy to adjust to your preferred date and time, either at your office or online.
+
+Thank you for the opportunity.
+
+`+SIG_EN},
+
+{id:'em_retail_event',channel:'email',group:'retail',title:'ลูกค้าจากงานอีเวนต์ – ขอบคุณ + ขอข้อมูล',
+ subject:'ขอบคุณที่แวะชมบูธ CERAFIELD – ข้อมูลผลิตภัณฑ์และการติดต่อ',
+ th:`เรียน {ชื่อ}
+
+สวัสดีครับ ขอขอบพระคุณเป็นอย่างยิ่งที่แวะเยี่ยมชมบูธ CERAFIELD และให้ความสนใจในผลิตภัณฑ์ของทางเราครับ
+
+ขณะนี้ CERAFIELD อยู่ระหว่างการเตรียมเปิดตลาดในประเทศไทยอย่างเป็นทางการ โดยสินค้าล็อตแรกมีกำหนดเข้าประเทศในเร็ว ๆ นี้ เพื่อให้ทางเราดูแลและอัปเดตข้อมูลให้ท่านได้อย่างรวดเร็วเมื่อสินค้าพร้อมส่งมอบ รบกวนขอข้อมูลเพิ่มเติมดังนี้ครับ
+• ชื่อ-นามสกุล
+• เบอร์โทรศัพท์ติดต่อ
+• จังหวัด/สถานที่ที่ต้องการติดตั้ง
+• จำนวนที่ต้องการโดยประมาณ
+• ช่วงเวลาที่ต้องการรับสินค้า/ติดตั้ง
+
+ทั้งนี้ ผมได้แนบ Catalog ล่าสุดของ CERAFIELD มาเพื่อประกอบการพิจารณาด้วยครับ หากมีคำถามเพิ่มเติมเกี่ยวกับสินค้า หรือสนใจผลิตภัณฑ์ประเภทอื่น ผมยินดีดูแลท่านโดยตรงครับ
+
+ขอบพระคุณอีกครั้งสำหรับความสนใจใน CERAFIELD ครับ
+
+`+SIG_TH,
+ en:`Dear {ชื่อ},
+
+Thank you very much for visiting the CERAFIELD booth and for your interest in our products.
+
+CERAFIELD is currently preparing for its official launch in Thailand, with the first shipment arriving soon. So that we can take care of you and update you promptly once stock is ready, could you kindly share:
+• Full name
+• Contact phone number
+• Province / installation location
+• Approximate quantity needed
+• Preferred delivery / installation period
+
+I have attached our latest CERAFIELD catalog for your reference. If you have any questions or are interested in other products, I would be glad to assist you directly.
+
+Thank you again for your interest in CERAFIELD.
+
+`+SIG_EN},
+
+{id:'em_retail_fu',channel:'email',group:'retail',title:'Follow-up ลูกค้าปลีก – สินค้าพร้อมส่ง',
+ subject:'CERAFIELD – อัปเดตสินค้าพร้อมส่งมอบ',
+ th:`เรียน {ชื่อ}
+
+ผมขออนุญาตอัปเดตความคืบหน้าจาก CERAFIELD ครับ ขณะนี้สินค้าบางรุ่นพร้อมส่งมอบแล้ว และผมนึกถึงท่านที่เคยให้ความสนใจผลิตภัณฑ์ของทางเรา
+
+หากท่านยังสนใจ หรือต้องการให้ผมช่วยแนะนำรุ่นที่เหมาะกับการใช้งานและงบประมาณ รบกวนแจ้งกลับได้เลยครับ ผมยินดีดูแลและจัดส่งใบเสนอราคาให้ท่านโดยตรงครับ
+
+ขอบพระคุณครับ
+
+`+SIG_TH,
+ en:`Dear {ชื่อ},
+
+I would like to share a quick update from CERAFIELD. Some of our models are now ready for delivery, and I thought of you as someone who showed interest in our products.
+
+If you are still interested, or would like me to recommend a model that suits your use and budget, please let me know. I would be glad to assist and send you a quotation directly.
+
+Thank you.
+
+`+SIG_EN},
+
+{id:'ig_proj_intro',channel:'ig',group:'project',title:'IG: ทักแนะนำตัว (สถาปนิก/นักออกแบบ)',
+ th:`สวัสดีครับ {ชื่อ} 🙏
+
+ผมโทนี่ จาก CERAFIELD THAILAND นะครับ — เราเป็นแบรนด์ Sanitaryware สำหรับงานโครงการ (Residential / Hospitality / Commercial)
+
+ติดตามผลงานของทางทีมอยู่ครับ เลยอยากขออนุญาตส่ง Catalog และข้อมูลผลิตภัณฑ์ให้ลองพิจารณาเผื่อใช้กับงานในอนาคต ไม่ทราบว่าสะดวกให้ส่งเข้าทางอีเมลหรือช่องทางไหนดีครับ 😊`,
+ en:`Hi {ชื่อ} 🙏 This is Tony from CERAFIELD THAILAND — a sanitaryware brand for Residential / Hospitality / Commercial projects. I admire your team's work and would love to share our catalog and product info for your future projects. May I send it to your email, or is there a preferred channel? 😊`},
+
+{id:'ig_retail_intro',channel:'ig',group:'retail',title:'IG: ทักลูกค้าปลีก',
+ th:`สวัสดีครับ {ชื่อ} 😊
+
+ขอบคุณที่สนใจผลิตภัณฑ์ CERAFIELD นะครับ เรามีสุขภัณฑ์ดีไซน์สวย คุณภาพงานโครงการ ในราคาที่จับต้องได้ครับ
+
+รบกวนสอบถามว่าสนใจรุ่นไหน หรืออยากได้ไปใช้กับห้องน้ำแบบไหนครับ เดี๋ยวผมแนะนำรุ่นที่เหมาะและส่ง Catalog ให้ดูได้เลยครับ 🙏`,
+ en:`Hi {ชื่อ} 😊 Thank you for your interest in CERAFIELD! We offer designer sanitaryware with project-grade quality at an accessible price. Which model are you interested in, or what kind of bathroom is it for? I'll recommend the right model and send you our catalog 🙏`},
+
+{id:'ig_fu',channel:'ig',group:'general',title:'IG: ตามครั้งถัดไป (สั้น)',
+ th:`สวัสดีครับ {ชื่อ} 🙏 ขออนุญาตตามอีกครั้งนะครับ ไม่ทราบว่าได้ลองดู Catalog ที่ส่งไปหรือยังครับ ถ้ามีคำถามหรืออยากได้ข้อมูลรุ่นไหนเพิ่ม บอกผมได้เลยครับ ยินดีดูแลครับ 😊`,
+ en:`Hi {ชื่อ} 🙏 Just following up — did you get a chance to look at the catalog I sent? If you have any questions or want more details on any model, just let me know. Happy to help 😊`},
+
+{id:'tt_intro',channel:'tiktok',group:'general',title:'TikTok: ทักแนะนำ (ข้อความเดียว)',
+ th:`สวัสดีครับ {ชื่อ} ผมโทนี่ จาก CERAFIELD THAILAND แบรนด์สุขภัณฑ์ดีไซน์สวยเกรดงานโครงการครับ 🙏 สนใจรุ่นไหนหรืออยากดู Catalog เพิ่ม ขอช่องทาง LINE/อีเมล แล้วผมส่งให้เลยครับ 😊`,
+ en:`Hi {ชื่อ}, this is Tony from CERAFIELD THAILAND — designer, project-grade sanitaryware 🙏 If you'd like to see our catalog, drop me your LINE or email and I'll send it over 😊`},
+
+{id:'line_intro',channel:'line',group:'general',title:'LINE: ทักแนะนำตัว',
+ th:`สวัสดีครับ {ชื่อ} 🙏 ผมโทนี่ จาก CERAFIELD THAILAND ครับ
+ขออนุญาตส่งข้อมูลผลิตภัณฑ์สุขภัณฑ์และ Catalog ให้พิจารณานะครับ หากสะดวก รบกวนแจ้งประเภทงาน/รุ่นที่สนใจ เดี๋ยวผมแนะนำรุ่นที่เหมาะให้ครับ ขอบคุณครับ 😊`,
+ en:`Hi {ชื่อ} 🙏 This is Tony from CERAFIELD THAILAND. May I share our sanitaryware information and catalog? If convenient, let me know the type of work or model you're interested in and I'll recommend the right one. Thank you 😊`},
+
+{id:'line_fu',channel:'line',group:'retail',title:'LINE: ตามลูกค้า (สั้น)',
+ th:`สวัสดีครับ {ชื่อ} 🙏 ขออนุญาตอัปเดตนะครับ สินค้าบางรุ่นพร้อมส่งแล้วครับ ถ้ายังสนใจ บอกรุ่น/จำนวนได้เลย เดี๋ยวผมจัดใบเสนอราคาให้ครับ 😊`,
+ en:`Hi {ชื่อ} 🙏 A quick update — some models are now ready for delivery. If you're still interested, let me know the model/quantity and I'll prepare a quotation 😊`}
+];
+
+const TPL_CH={email:{lbl:'✉️ อีเมล',cls:'a-email'},ig:{lbl:'📷 Instagram',cls:'r-interior'},tiktok:{lbl:'🎵 TikTok',cls:'b-new'},line:{lbl:'💬 LINE',cls:'a-line'}};
+const TPL_GRP={project:'🏗️ โครงการ/สถาปนิก',retail:'🛍️ ลูกค้าปลีก',general:'🌐 ทั่วไป'};
+let TPL_EN={};
+
+function tplFill(s){
+  if(!s)return s;
+  const name=(document.getElementById('tplName')?.value||'').trim()||'คุณลูกค้า';
+  const co=(document.getElementById('tplCo')?.value||'').trim();
+  return s.split('{ชื่อ}').join(name).split('{บริษัท}').join(co);
+}
+function tplToggle(id){TPL_EN[id]=!TPL_EN[id];renderTpl()}
+function tplToClip(txt){
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(txt).then(()=>toast('📋 คัดลอกแล้ว — วางในแอปได้เลย'),()=>tplFallbackCopy(txt))}
+  else tplFallbackCopy(txt);
+}
+function tplFallbackCopy(txt){const ta=document.createElement('textarea');ta.value=txt;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();try{document.execCommand('copy');toast('📋 คัดลอกแล้ว')}catch(e){alert('คัดลอกไม่สำเร็จ')}document.body.removeChild(ta)}
+function tplCopy(id,which){
+  const t=TEMPLATES.find(x=>x.id===id);if(!t)return;
+  const txt=which==='subject'?tplFill(t.subject):tplFill(which==='en'?(t.en||t.th):t.th);
+  tplToClip(txt);
+}
+function tplGmail(id,en){
+  const t=TEMPLATES.find(x=>x.id===id);if(!t)return;
+  const to=document.getElementById('tplEmail').value||'';
+  const su=encodeURIComponent(tplFill(t.subject||''));
+  const bo=encodeURIComponent(tplFill(en?(t.en||t.th):t.th));
+  window.open(`https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(to)}&su=${su}&body=${bo}`,'_blank');
+}
+function tplPick(cid){
+  const x=db();const c=x.contacts.find(q=>q.id===cid);if(!c)return;
+  document.getElementById('tplName').value=c.name;
+  document.getElementById('tplCo').value=c.co||'';
+  document.getElementById('tplEmail').value=c.email||'';
+  document.getElementById('tplContactList').style.display='none';
+  renderTpl();
+}
+function tplFilterContacts(){
+  const x=db();
+  const q=(document.getElementById('tplName').value||'').toLowerCase().trim();
+  const list=document.getElementById('tplContactList');
+  let cs=x.contacts.filter(c=>{
+    if(!q)return true;
+    const p=x.projects.find(pp=>pp.id===c.projId);
+    return[c.name,c.co,p&&p.name].some(v=>v&&v.toLowerCase().includes(q));
+  }).slice(0,40);
+  if(!cs.length){list.style.display='none';return}
+  list.innerHTML=cs.map(c=>`<div class="combo-item" onmousedown="event.preventDefault();tplPick('${c.id}')"><span class="badge ${ROLE_CLS[c.role]||'r-other'}" style="font-size:9px;flex-shrink:0">${ROLE_LBL[c.role]||c.role}</span><span><b>${c.name}</b>${c.co?` <span style='color:var(--gray);font-size:11px'>· ${c.co}</span>`:''}</span></div>`).join('');
+  list.style.display='block';
+}
+function renderTpl(){
+  const chF=document.getElementById('tplChannelFilter')?.value||'';
+  const grF=document.getElementById('tplGroupFilter')?.value||'';
+  const list=TEMPLATES.filter(t=>(!chF||t.channel===chF)&&(!grF||t.group===grF));
+  const el=document.getElementById('tplList');
+  if(!list.length){el.innerHTML=`<div class="empty"><div class="empty-ico">📭</div><div>ไม่มีต้นแบบในหมวดนี้</div></div>`;return}
+  el.innerHTML=list.map(t=>{
+    const en=!!TPL_EN[t.id]&&!!t.en;
+    const body=tplFill(en?t.en:t.th);
+    const subj=t.subject?tplFill(t.subject):'';
+    const ch=TPL_CH[t.channel]||{lbl:t.channel,cls:'b-new'};
+    return`<div style="border:1px solid #eee;border-radius:12px;padding:14px;margin-bottom:14px;background:#fff">
+      <div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-bottom:8px">
+        <span class="badge ${ch.cls}">${ch.lbl}</span>
+        <span class="badge" style="background:#f4f2ee;color:#6b4f1d">${TPL_GRP[t.group]||t.group}</span>
+        <span style="font-weight:700;font-size:14px;color:var(--navy)">${t.title}</span>
+        ${t.en?`<button class="btn btn-sm btn-ghost" style="margin-left:auto;padding:3px 9px;font-size:11px" onclick="tplToggle('${t.id}')">${en?'🇹🇭 ไทย':'🇬🇧 English'}</button>`:''}
+      </div>
+      ${subj?`<div style="font-size:12.5px;margin-bottom:7px;background:var(--cream);padding:7px 10px;border-radius:7px"><b>หัวข้อ:</b> ${subj} &nbsp;<span style="cursor:pointer;color:var(--navy);font-weight:700" onclick="tplCopy('${t.id}','subject')">[คัดลอกหัวข้อ]</span></div>`:''}
+      <div style="white-space:pre-wrap;font-size:13px;line-height:1.65;color:#333;background:#fafafa;border:1px solid #f0f0f0;border-radius:8px;padding:11px;max-height:240px;overflow:auto">${body}</div>
+      <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+        <button class="btn btn-sm btn-primary" onclick="tplCopy('${t.id}','${en?'en':'th'}')">📋 คัดลอกข้อความ</button>
+        ${t.en?`<button class="btn btn-sm btn-ghost" onclick="tplCopy('${t.id}','${en?'th':'en'}')">📋 คัดลอก ${en?'TH':'EN'}</button>`:''}
+        ${t.channel==='email'?`<button class="btn btn-sm btn-ghost" onclick="tplGmail('${t.id}',${en})">✉️ เปิด Gmail</button>`:''}
+      </div>
+    </div>`;
+  }).join('');
 }
 
 // ── SEARCH ─────────────────────────────────────────────────────
