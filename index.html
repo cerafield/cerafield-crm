@@ -2240,9 +2240,9 @@ function renderRpt(){
 }
 
 // ── MESSAGE TEMPLATES ──────────────────────────────────────────
-// Signature is added automatically by Gmail, so templates leave it out to avoid duplication.
-const SIG_TH=``;
-const SIG_EN=``;
+// Closing line only — the name/contact block comes from the user's Gmail signature, so it's not repeated here.
+const SIG_TH=`ขอแสดงความนับถือ`;
+const SIG_EN=`Best regards,`;
 
 const TEMPLATES=[
 {id:'em_proj_intro',channel:'email',group:'project',title:'แนะนำบริษัท (ครั้งแรก)',
@@ -2272,6 +2272,7 @@ CERAFIELD THAILAND มุ่งเน้นการนำเสนอ Sanitaryw
 หากมีโอกาสที่เหมาะสม ผมและทีมงานยินดีเข้าพบเพื่อแนะนำผลิตภัณฑ์และอัปเดตข้อมูลเพิ่มเติมให้กับทางทีมงานในโอกาสต่อไปครับ
 
 ขอขอบพระคุณสำหรับเวลาและการพิจารณา หวังเป็นอย่างยิ่งว่าจะมีโอกาสได้ร่วมงานกับทาง {บริษัท} ในอนาคตครับ
+
 `+SIG_TH,
  en:`Dear Design Team - {บริษัท}
 
@@ -2298,6 +2299,7 @@ If your team has a project under design or material selection and would like fur
 When the timing is right, my team and I would be delighted to meet and present our products and updates to your team.
 
 Thank you for your time and consideration. We sincerely hope to have the opportunity to work with {บริษัท} in the future.
+
 `+SIG_EN},
 
 {id:'em_proj_fu1',channel:'email',group:'project',title:'Follow-up ครั้งที่ 1 – ส่ง Catalog อัปเดต',
