@@ -2474,9 +2474,40 @@ Thank you.
  th:`สวัสดีครับ {ชื่อ} 🙏 ขออนุญาตตามอีกครั้งนะครับ ไม่ทราบว่าได้ลองดู Catalog ที่ส่งไปหรือยังครับ ถ้ามีคำถามหรืออยากได้ข้อมูลรุ่นไหนเพิ่ม บอกผมได้เลยครับ ยินดีดูแลครับ 😊`,
  en:`Hi {ชื่อ} 🙏 Just following up — did you get a chance to look at the catalog I sent? If you have any questions or want more details on any model, just let me know. Happy to help 😊`},
 
-{id:'tt_intro',channel:'tiktok',group:'general',title:'TikTok: ทักแนะนำ (ข้อความเดียว)',
- th:`สวัสดีครับ {ชื่อ} ผมโทนี่ จาก CERAFIELD THAILAND แบรนด์สุขภัณฑ์ดีไซน์สวยเกรดงานโครงการครับ 🙏 สนใจรุ่นไหนหรืออยากดู Catalog เพิ่ม ขอช่องทาง LINE/อีเมล แล้วผมส่งให้เลยครับ 😊`,
- en:`Hi {ชื่อ}, this is Tony from CERAFIELD THAILAND — designer, project-grade sanitaryware 🙏 If you'd like to see our catalog, drop me your LINE or email and I'll send it over 😊`},
+{id:'tt_intro',channel:'tiktok',group:'general',title:'TikTok: ทักแนะนำ (เลือกกลุ่มได้)',
+ variants:[
+   {key:'arch',label:'สถาปนิก',line:'ชอบผลงานการออกแบบของทีมมากครับ',en:"I really like your team's design work."},
+   {key:'id',label:'Interior Designer',line:'ชอบแนวคิดและรายละเอียดงานตกแต่งของทีมมากครับ',en:"I really like your team's concepts and attention to detail in interior work."},
+   {key:'builder',label:'บริษัทรับสร้างบ้าน',line:'ชอบคอนเทนต์เกี่ยวกับการสร้างบ้านและการเลือกวัสดุที่แชร์ครับ',en:'I really enjoy your content on home building and material selection.'},
+   {key:'dev',label:'อสังหาริมทรัพย์',line:'ชอบคอนเทนต์เกี่ยวกับการพัฒนาโครงการและการลงทุนด้านอสังหาริมทรัพย์ครับ',en:'I really like your content on property development and real-estate investment.'},
+   {key:'creator',label:'Creator รีวิวบ้าน',line:'ชอบคอนเทนต์รีวิวบ้านและการใช้งานจริงของคุณมากครับ',en:'I really enjoy your home reviews and real-world usage content.'}
+ ],
+ th:`สวัสดีครับ 🙏
+
+ผมโทนี่ จาก CERAFIELD THAILAND ครับ
+
+ผมติดตามคอนเทนต์ของคุณมาสักพักแล้วครับ {คอม} ส่วนตัวมองว่าเป็นข้อมูลที่มีประโยชน์และสามารถนำไปใช้งานได้จริงครับ
+
+ปัจจุบันผมดูแลแบรนด์สุขภัณฑ์ CERAFIELD โดยโรงงานผู้ผลิตของเราเป็นหนึ่งในผู้ผลิตรายใหญ่ของประเทศจีน มีประสบการณ์ผลิตสินค้าแบบ OEM ให้กับตลาดยุโรปและสหรัฐอเมริกามาอย่างต่อเนื่อง รวมถึงเคยผลิตให้กับแบรนด์ชั้นนำในประเทศไทยด้วยครับ
+
+ผมจึงอยากขออนุญาตแนะนำแบรนด์ CERAFIELD ให้คุณรู้จัก เผื่อจะเป็นอีกหนึ่งทางเลือกสำหรับงานบ้าน งานรีวิว หรือโครงการที่คุณและทีมงานดูแลในอนาคตครับ
+
+หากสะดวก รบกวนขออีเมลหรือช่องทางติดต่อที่สามารถส่ง Company Profile และ Product Catalog ไปแนะนำตัวได้ไหมครับ
+
+ขอบพระคุณมากครับ 🙏`,
+ en:`Hello 🙏
+
+This is Tony from CERAFIELD THAILAND.
+
+I've been following your content for a while. {คอม} I find it genuinely useful and practical.
+
+I currently manage the CERAFIELD sanitaryware brand. Our manufacturer is one of the major producers in China, with continuous OEM experience for the European and US markets, and has also produced for leading brands in Thailand.
+
+I'd love to introduce CERAFIELD to you, as a possible option for the homes, reviews, or projects you and your team work on in the future.
+
+If convenient, may I have your email or a contact channel to send our Company Profile and Product Catalog?
+
+Thank you so much 🙏`},
 
 {id:'line_intro',channel:'line',group:'general',title:'LINE: ทักแนะนำตัว',
  th:`สวัสดีครับ {ชื่อ} 🙏 ผมโทนี่ จาก CERAFIELD THAILAND ครับ
@@ -2491,6 +2522,7 @@ Thank you.
 const TPL_CH={email:{lbl:'✉️ อีเมล',cls:'a-email'},ig:{lbl:'📷 Instagram',cls:'r-interior'},tiktok:{lbl:'🎵 TikTok',cls:'b-new'},line:{lbl:'💬 LINE',cls:'a-line'}};
 const TPL_GRP={project:'🏗️ โครงการ/สถาปนิก',retail:'🛍️ ลูกค้าปลีก',general:'🌐 ทั่วไป'};
 let TPL_EN={};
+let TPL_VAR={}; // selected audience variant per template id
 
 function tplFill(s){
   if(!s)return s;
@@ -2498,6 +2530,16 @@ function tplFill(s){
   const co=(document.getElementById('tplCo')?.value||'').trim();
   return s.split('{ชื่อ}').join(name).split('{บริษัท}').join(co);
 }
+// Resolve a template's body for the chosen language + audience variant, then personalize
+function tplText(t,en){
+  let s=en?(t.en||t.th):t.th;
+  if(t.variants&&t.variants.length){
+    const v=t.variants.find(x=>x.key===TPL_VAR[t.id])||t.variants[0];
+    s=s.split('{คอม}').join(en?(v.en||v.line):v.line);
+  }
+  return tplFill(s);
+}
+function tplSetVar(id,key){TPL_VAR[id]=key;renderTpl()}
 function tplToggle(id){TPL_EN[id]=!TPL_EN[id];renderTpl()}
 function tplToClip(txt){
   if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(txt).then(()=>toast('📋 คัดลอกแล้ว — วางในแอปได้เลย'),()=>tplFallbackCopy(txt))}
@@ -2506,14 +2548,14 @@ function tplToClip(txt){
 function tplFallbackCopy(txt){const ta=document.createElement('textarea');ta.value=txt;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();try{document.execCommand('copy');toast('📋 คัดลอกแล้ว')}catch(e){alert('คัดลอกไม่สำเร็จ')}document.body.removeChild(ta)}
 function tplCopy(id,which){
   const t=TEMPLATES.find(x=>x.id===id);if(!t)return;
-  const txt=which==='subject'?tplFill(t.subject):tplFill(which==='en'?(t.en||t.th):t.th);
+  const txt=which==='subject'?tplFill(t.subject):tplText(t,which==='en');
   tplToClip(txt);
 }
 function tplGmail(id,en){
   const t=TEMPLATES.find(x=>x.id===id);if(!t)return;
   const to=document.getElementById('tplEmail').value||'';
   const su=encodeURIComponent(tplFill(t.subject||''));
-  const bo=encodeURIComponent(tplFill(en?(t.en||t.th):t.th));
+  const bo=encodeURIComponent(tplText(t,en));
   window.open(`https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(to)}&su=${su}&body=${bo}`,'_blank');
 }
 function tplPick(cid){
@@ -2545,9 +2587,10 @@ function renderTpl(){
   if(!list.length){el.innerHTML=`<div class="empty"><div class="empty-ico">📭</div><div>ไม่มีต้นแบบในหมวดนี้</div></div>`;return}
   el.innerHTML=list.map(t=>{
     const en=!!TPL_EN[t.id]&&!!t.en;
-    const body=tplFill(en?t.en:t.th);
+    const body=tplText(t,en);
     const subj=t.subject?tplFill(t.subject):'';
     const ch=TPL_CH[t.channel]||{lbl:t.channel,cls:'b-new'};
+    const curVar=TPL_VAR[t.id]||(t.variants&&t.variants[0].key);
     return`<div style="border:1px solid #eee;border-radius:12px;padding:14px;margin-bottom:14px;background:#fff">
       <div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-bottom:8px">
         <span class="badge ${ch.cls}">${ch.lbl}</span>
@@ -2555,6 +2598,7 @@ function renderTpl(){
         <span style="font-weight:700;font-size:14px;color:var(--navy)">${t.title}</span>
         ${t.en?`<button class="btn btn-sm btn-ghost" style="margin-left:auto;padding:3px 9px;font-size:11px" onclick="tplToggle('${t.id}')">${en?'🇹🇭 ไทย':'🇬🇧 English'}</button>`:''}
       </div>
+      ${t.variants?`<div style="margin-bottom:8px"><span style="font-size:12px;color:var(--gray)">🎯 กลุ่มเป้าหมาย:</span> <select onchange="tplSetVar('${t.id}',this.value)" style="width:auto;min-width:190px;font-size:12px;padding:5px 8px;margin-left:4px">${t.variants.map(v=>`<option value="${v.key}" ${curVar===v.key?'selected':''}>${v.label}</option>`).join('')}</select></div>`:''}
       ${subj?`<div style="font-size:12.5px;margin-bottom:7px;background:var(--cream);padding:7px 10px;border-radius:7px"><b>หัวข้อ:</b> ${subj} &nbsp;<span style="cursor:pointer;color:var(--navy);font-weight:700" onclick="tplCopy('${t.id}','subject')">[คัดลอกหัวข้อ]</span></div>`:''}
       <div style="white-space:pre-wrap;font-size:13px;line-height:1.65;color:#333;background:#fafafa;border:1px solid #f0f0f0;border-radius:8px;padding:11px;max-height:240px;overflow:auto">${body}</div>
       <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
