@@ -139,6 +139,9 @@ tr:last-child td{border-bottom:none}
 .combo-item:last-child{border-bottom:none}
 .combo-item:hover{background:var(--cream)}
 .combo-empty{padding:16px;text-align:center;color:var(--gray);font-size:13px}
+.chip-btn{padding:8px 15px;border:1px solid #ddd;border-radius:999px;background:#fff;cursor:pointer;font-size:13px;font-weight:600;color:var(--gd);transition:.15s;white-space:nowrap}
+.chip-btn:hover{border-color:var(--gold)}
+.chip-btn.active{background:var(--navy);color:#fff;border-color:var(--navy)}
 label{display:block;font-size:11px;font-weight:700;color:var(--gd);margin-bottom:5px;text-transform:uppercase;letter-spacing:.3px}
 input,select,textarea{width:100%;padding:9px 11px;border:1px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit;color:var(--text);outline:none;transition:.2s;background:#fff}
 input:focus,select:focus,textarea:focus{border-color:var(--navy);box-shadow:0 0 0 3px rgba(26,43,94,.08)}
@@ -422,14 +425,8 @@ textarea{resize:vertical;min-height:75px}
     </div>
   </div>
   <div class="card">
+    <div id="tplChannelBtns" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px"></div>
     <div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap">
-      <select id="tplChannelFilter" onchange="renderTpl()" style="width:170px">
-        <option value="">📡 ทุกช่องทาง</option>
-        <option value="email">✉️ อีเมล</option>
-        <option value="ig">📷 Instagram</option>
-        <option value="tiktok">🎵 TikTok</option>
-        <option value="line">💬 LINE</option>
-      </select>
       <select id="tplGroupFilter" onchange="renderTpl()" style="width:200px">
         <option value="">👥 ทุกกลุ่ม</option>
         <option value="project">🏗️ โครงการ / สถาปนิก</option>
@@ -2523,6 +2520,8 @@ const TPL_CH={email:{lbl:'✉️ อีเมล',cls:'a-email'},ig:{lbl:'📷 I
 const TPL_GRP={project:'🏗️ โครงการ/สถาปนิก',retail:'🛍️ ลูกค้าปลีก',general:'🌐 ทั่วไป'};
 let TPL_EN={};
 let TPL_VAR={}; // selected audience variant per template id
+let TPL_CHF=''; // selected channel filter (button)
+function tplSetChannel(v){TPL_CHF=v;renderTpl()}
 
 function tplFill(s){
   if(!s)return s;
@@ -2580,8 +2579,13 @@ function tplFilterContacts(){
   list.style.display='block';
 }
 function renderTpl(){
-  const chF=document.getElementById('tplChannelFilter')?.value||'';
+  const chF=TPL_CHF;
   const grF=document.getElementById('tplGroupFilter')?.value||'';
+  const btns=document.getElementById('tplChannelBtns');
+  if(btns){
+    const CHS=[['','📋 ทุกช่องทาง'],['email','✉️ อีเมล'],['ig','📷 Instagram'],['tiktok','🎵 TikTok'],['line','💬 LINE']];
+    btns.innerHTML=CHS.map(([v,l])=>`<button class="chip-btn ${chF===v?'active':''}" onclick="tplSetChannel('${v}')">${l}</button>`).join('');
+  }
   const list=TEMPLATES.filter(t=>(!chF||t.channel===chF)&&(!grF||t.group===grF));
   const el=document.getElementById('tplList');
   if(!list.length){el.innerHTML=`<div class="empty"><div class="empty-ico">📭</div><div>ไม่มีต้นแบบในหมวดนี้</div></div>`;return}
